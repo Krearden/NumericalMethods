@@ -1,2 +1,2 @@
-# Numerical-Methods
-Repository for numerical methods labs
+# NumericalMethods
+Repository for numerical methods labs (NumericalMethods class 2022)
