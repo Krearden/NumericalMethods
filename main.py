@@ -31,37 +31,48 @@ def printMatrix(matrix):
     else:
         print("Empty matrix given")
 
-#get LU matrix from A matrix
-def getLUfromA(A_matrix):
-    n = len(A_matrix)
-    for j in range(n):
+
+def getLUfromA(A):
+    pass
+
+def getUfromA(A, n, p):
+    for k in range(n - 1):
+        # находим индекс масксимального элемента в k-том столбце
+        max_el = 0
+        imax = -1
         for i in range(n):
-            number = min(i, j) - 1
-            summ_of_multiply = getSummOfMultiply_ij(A_matrix, i, j, number)
-            A_matrix[i][j]  = A_matrix[i][j] - summ_of_multiply
-            if (i > j):
-                A_matrix[i][j] = A_matrix[i][j] / A_matrix[j][j]
-    return A_matrix
+            if(abs(A[i][k]) > abs(max_el)):
+                max_el = A[i][k]
+                imax = i
+        #меняем строки местами
+        if (imax != k):
+            A = swapRows(A, k, imax)
+            p = swapRows(p, k, imax)
+        #проверка на вырожденность
+        if (A[k][k] == 0):
+            print("Вырожденная матрица")
+            return
+        #делаем волшебные действия (не работает) (нужно получить нули под элементом k, k)
+        for i in range(k + 1):
+            pass
+    return A, p
+def getLfromA(U):
+    pass
 
-
-
-# сумма произведений элементов i-той j-того столбца матрицы
-def getSummOfMultiply_ij(matrix, i, j, n):
-    summ = 0.0
-    for k in range(n):
-        summ += matrix[i][k] * matrix[k][j]
-        print("{} * {} + \n".format(matrix[i][k], matrix[k][j]))
-    return summ
-
+def swapRows(A, i, j):
+    temp = A[i]
+    A[i] = A[j]
+    A[j] = temp
+    return A
 
 #MAIN
 filepath = "files/"
 filename = "var_18_b.txt"
-A_matrix = readMatrixFromFile(filepath + filename)
-LU_matrix = getLUfromA(A_matrix)
-print("A:")
-printMatrix(A_matrix)
-print("LU:")
-printMatrix(LU_matrix)
-
+A = readMatrixFromFile(filepath + filename) #матрица A
+n = len(A) #количество элементов матрицы
+p = [0, 1, 2, 3] #вектор перестановок
+printMatrix(A)
+print()
+printMatrix(getUfromA(A, n, p)[0])
+print(getUfromA(A, n, p)[1])
 
