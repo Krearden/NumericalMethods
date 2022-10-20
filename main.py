@@ -26,53 +26,58 @@ def printMatrix(matrix):
     if matrix:
         for row in matrix:
             for element in row:
-                print("{:10.5f} ".format(element), end="")
+                print("{:10.6f} ".format(element), end="")
             print()
     else:
         print("Empty matrix given")
 
+#LU
+def LU(A):
+    n = len(A)
+    P = list([[1 if i == j else 0 for j in range(n)] for i in range(n)]) #матрица перестановок
 
-def getLUfromA(A):
-    pass
+    for i in range(n):
 
-def getUfromA(A, n, p):
-    for k in range(n - 1):
-        # находим индекс масксимального элемента в k-том столбце
+        #находим главный элемент в столбце i и меняем строки местами
         max_el = 0
-        imax = -1
-        for i in range(n):
-            if(abs(A[i][k]) > abs(max_el)):
-                max_el = A[i][k]
-                imax = i
-        #меняем строки местами
-        if (imax != k):
-            A = swapRows(A, k, imax)
-            p = swapRows(p, k, imax)
-        #проверка на вырожденность
-        if (A[k][k] == 0):
-            print("Вырожденная матрица")
-            return
-        #делаем волшебные действия (не работает) (нужно получить нули под элементом k, k)
-        for i in range(k + 1):
-            pass
-    return A, p
-def getLfromA(U):
-    pass
+        max_el_row_index = -1
+        for k in range(i, n):
+            if(abs(A[k][i]) > max_el):
+                max_el = abs(A[k][i])
+                max_el_row_index = k
+        if (max_el != 0 and max_el_row_index != i):
+            P = swapRows(P, i, max_el_row_index)
+            A = swapRows(A, i, max_el_row_index)
 
-def swapRows(A, i, j):
-    temp = A[i]
-    A[i] = A[j]
-    A[j] = temp
+        main_element = A[i][i]
+        for row_element in range(n):
+            A[i][row_element] /= main_element
+        for k in range(i + 1, n):
+            element_to_multiply = A[k][i] #- элемент на который умножать (первый элемент каждой строки ниже i-той)
+            for j in range(i, n):
+                A[k][j] = A[k][j] - A[i][j] * element_to_multiply
+        print("i = {}".format(i))
+        printMatrix(A)
+        print()
+    print("U matirx made from A: ")
+    printMatrix(A)
+    print("P: ")
+    printMatrix(P)
     return A
+
+#еденичная матрица
+def swapRows(matrix, i, j):
+    temp = matrix[i]
+    matrix[i] = matrix[j]
+    matrix[j] = temp
+    return matrix
 
 #MAIN
 filepath = "files/"
-filename = "var_18_b.txt"
+filename = "test_1.txt"
 A = readMatrixFromFile(filepath + filename) #матрица A
-n = len(A) #количество элементов матрицы
-p = [0, 1, 2, 3] #вектор перестановок
+print("A:")
 printMatrix(A)
 print()
-printMatrix(getUfromA(A, n, p)[0])
-print(getUfromA(A, n, p)[1])
+LU(A)
 
