@@ -58,6 +58,7 @@ def LU(A):
     vector_p = [0, 1, 2, 3]
     L = list([[0  for j in range(n)] for i in range(n)])
     U = list([[A[i][j]  for j in range(n)] for i in range(n)])
+    sign = 1
 
     for i in range(n):
         #находим главный элемент в столбце i и меняем строки местами
@@ -70,6 +71,7 @@ def LU(A):
         if (max_el != 0 and max_el_row_index != i):
             p = swapRows(p, i, max_el_row_index)
             U = swapRows(U, i, max_el_row_index)
+            sign *= -1
         #метод гаусса с перестановкой строк (формируем матрицу U)
         main_element = U[i][i]
         L[i][i] = main_element
