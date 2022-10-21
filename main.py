@@ -31,13 +31,34 @@ def printMatrix(matrix):
     else:
         print("Empty matrix given")
 
+#multiply Matrix By Vector (to find b)
+def multipMatrix(m, v):
+    rv = []
+
+    for row in m:
+        rowResult = 0
+        for elemPos in range(len(row)):
+            rowResult += row[elemPos] * v[elemPos]
+        rv.append(rowResult)
+
+    return rv
+
+#get P matrix from p vector
+def getPmatrix(p):
+    n = len(p)
+    P = list([[0  for j in range(n)] for i in range(n)])
+    for i in range(n):
+        P[i][p[i]] = 1
+    return P
+
 #LU
 def LU(A):
     n = len(A)
-    P = list([[1 if i == j else 0 for j in range(n)] for i in range(n)]) #матрица перестановок
+    p = list([i for i in range(n)]) #вектор перестановок
     vector_p = [0, 1, 2, 3]
-    L = list([[0 for j in range(n)] for i in range(n)])
-    U = A.copy()
+    L = list([[0  for j in range(n)] for i in range(n)])
+    U = list([[A[i][j]  for j in range(n)] for i in range(n)])
+
     for i in range(n):
         #находим главный элемент в столбце i и меняем строки местами
         max_el = 0
@@ -47,9 +68,8 @@ def LU(A):
                 max_el = abs(U[k][i])
                 max_el_row_index = k
         if (max_el != 0 and max_el_row_index != i):
-            P = swapRows(P, i, max_el_row_index)
-            A = swapRows(U, i, max_el_row_index)
-            vector_p = swapRows(vector_p, i, max_el_row_index)
+            p = swapRows(p, i, max_el_row_index)
+            U = swapRows(U, i, max_el_row_index)
         #метод гаусса с перестановкой строк (формируем матрицу U)
         main_element = U[i][i]
         L[i][i] = main_element
@@ -60,7 +80,7 @@ def LU(A):
             for j in range(i, n):
                 U[k][j] = U[k][j] - U[i][j] * element_to_multiply
 
-        #формируем матрицу L ПОКА НЕ РАБОТАЕТ потому что А меняется вместе с У (why?)
+        #формируем матрицу L
         for j in range(i):
             summ = 0
             for k in range(j):
@@ -72,6 +92,8 @@ def LU(A):
         print("i = {}".format(i))
         printMatrix(U)
         print()
+
+    print("Result of LU decomposition:" )
     print("A: ")
     printMatrix(A)
     print("U: ")
@@ -79,7 +101,8 @@ def LU(A):
     print("L: ")
     printMatrix(L)
     print("P: ")
-    printMatrix(P)
+    printMatrix(getPmatrix(p))
+    print(p)
     return A
 
 #еденичная матрица
@@ -93,8 +116,4 @@ def swapRows(matrix, i, j):
 filepath = "files/"
 filename = "test_1.txt"
 A = readMatrixFromFile(filepath + filename) #матрица A
-print("A:")
-printMatrix(A)
-print()
 LU(A)
-
