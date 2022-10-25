@@ -9,6 +9,15 @@ def multipyMatrix(first_matrix, second_matrix):
 
     return result_matrix
 
+def matrixSubtraction(first_matrix, second_matrix):
+    length = len(first_matrix)
+    result_matrix = [[0 for i in range(length)] for i in range(length)]
+    for i in range(length):
+        for j in range(length):
+            result_matrix[i][j] = first_matrix[i][j] - second_matrix[i][j]
+    
+    return result_matrix
+
 if __name__ == "__main__":
     first_matrix = [
         [1, 2, 3],
@@ -21,4 +30,4 @@ if __name__ == "__main__":
         [3, 6, 9]
     ]
 
-    print(multipyMatrix(first_matrix, second_matrix))
+    print(matrixSubtraction(first_matrix, second_matrix))
