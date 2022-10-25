@@ -1,5 +1,5 @@
 #coding=utf-8
-
+from matrixMethods import *
 
 # Лабораторная работа № 2 на тему «Прямые методы решения систем линейных алгебраических уравнений»
 # Выполнили Запорожченко Кирилл и Педаев Михаил (ФЗ-11)
@@ -22,26 +22,24 @@ def readMatrixFromFile(filename):
     return matrix
 
 #print matrix on the screen
-def printMatrix(matrix):
+def printMatrix(matrix, accuracy = False):
     if matrix:
         for row in matrix:
             for element in row:
-                print("{:10.6f} ".format(element), end="")
+                if accuracy:
+                    print("{:10.20f} ".format(element), end="")
+                else:
+                    print("{:10.6f} ".format(element), end="")
             print()
     else:
         print("Empty matrix given")
 
-#multiply Matrix By Vector (to find b)
-def multipMatrix(m, v):
-    rv = []
-
-    for row in m:
-        rowResult = 0
-        for elemPos in range(len(row)):
-            rowResult += row[elemPos] * v[elemPos]
-        rv.append(rowResult)
-
-    return rv
+#единичная матрица
+def swapRows(matrix, i, j):
+    temp = matrix[i]
+    matrix[i] = matrix[j]
+    matrix[j] = temp
+    return matrix
 
 #get P matrix from p vector
 def getPmatrix(p):
@@ -100,7 +98,7 @@ def LU(A):
             summ = 0
             for k in range(j):
                 summ += L[i][k] * U[k][j]
-            L[i][j] = A[vector_p[i]][j] - summ
+            L[i][j] = A[p[i]][j] - summ
 
         print("i = {}; max_el_row_index = {};".format(i, max_el_row_index))
         print("U: ")
@@ -111,12 +109,12 @@ def LU(A):
 
     return A, L, U, p
 
-#единичная матрица
-def swapRows(matrix, i, j):
-    temp = matrix[i]
-    matrix[i] = matrix[j]
-    matrix[j] = temp
-    return matrix
+def checkIfCorrectLU(A, L, U, p):
+    P = getPmatrix(p)
+    LU = multiplyMatrix(L, U)
+    PA = multiplyMatrix(P, A)
+
+    return matrixSubtraction(LU, PA)
 
 #MAIN
 filepath = "files/"
@@ -134,6 +132,10 @@ printMatrix(L)
 print("P: ")
 printMatrix(getPmatrix(p))
 print(p)
+
+print("Check if LU decomposition is correct: ")
+should_be_zeros = checkIfCorrectLU(A, L, U, p)
+printMatrix(should_be_zeros, True)
 
 rank = getRankMatrixFromU(U)
 print("Rank = {}".format(rank))

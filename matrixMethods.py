@@ -1,5 +1,14 @@
+#multiply Matrix By Vector (to find b)
+def multipMatrixByVector(m, v):
+    rv = []
+    for row in m:
+        rowResult = 0
+        for elemPos in range(len(row)):
+            rowResult += row[elemPos] * v[elemPos]
+        rv.append(rowResult)
 
-def multipyMatrix(first_matrix, second_matrix):
+    return rv
+def multiplyMatrix(first_matrix, second_matrix):
     length = len(first_matrix) 
     result_matrix = [[0 for i in range(length)] for i in range(length)]
     for i in range(length):
@@ -30,4 +39,4 @@ if __name__ == "__main__":
         [3, 6, 9]
     ]
 
-    print(matrixSubtraction(first_matrix, second_matrix))
+    print(multiplyMatrix(first_matrix, second_matrix))
