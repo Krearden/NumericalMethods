@@ -62,6 +62,15 @@ def getRankMatrixFromU(U):
 
     return rank
 
+def computeDeterminantFromL(L, sign):
+    n = len(L)
+    det = 1
+    for i in range(n):
+        det *= L[i][i]
+    det *= sign
+
+    return det
+
 #LU
 def LU(A):
     n = len(A)
@@ -107,7 +116,7 @@ def LU(A):
         printMatrix(L)
         print("\n\n")
 
-    return A, L, U, p
+    return A, L, U, p, sign
 
 def checkIfCorrectLU(A, L, U, p):
     P = getPmatrix(p)
@@ -120,7 +129,7 @@ def checkIfCorrectLU(A, L, U, p):
 filepath = "files/"
 filename = "test_1.txt"
 A = readMatrixFromFile(filepath + filename) #матрица A
-A, L, U, p = LU(A)
+A, L, U, p, sign = LU(A)
 
 print("Result of LU decomposition:" )
 print("A: ")
@@ -133,9 +142,12 @@ print("P: ")
 printMatrix(getPmatrix(p))
 print(p)
 
-print("Check if LU decomposition is correct: ")
+print("Check if LU decomposition is correct (L*U-P*A): ")
 should_be_zeros = checkIfCorrectLU(A, L, U, p)
 printMatrix(should_be_zeros, True)
 
 rank = getRankMatrixFromU(U)
 print("Rank = {}".format(rank))
+
+determinant = computeDeterminantFromL(L, sign)
+print("Determinant = {}".format(determinant))
