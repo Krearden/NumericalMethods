@@ -51,6 +51,19 @@ def getPmatrix(p):
         P[i][p[i]] = 1
     return P
 
+def getRankMatrixFromU(U):
+    n = len(U)
+    temp = 0
+    rank = 0
+    for i in range(n):
+        for j in range(n):
+            temp += U[i][j]
+        if (temp != 0):
+            rank += 1
+        temp = 0
+
+    return rank
+
 #LU
 def LU(A):
     n = len(A)
@@ -89,25 +102,16 @@ def LU(A):
                 summ += L[i][k] * U[k][j]
             L[i][j] = A[vector_p[i]][j] - summ
 
-
-
-        print("i = {}".format(i))
+        print("i = {}; max_el_row_index = {};".format(i, max_el_row_index))
+        print("U: ")
         printMatrix(U)
-        print()
+        print("L: ")
+        printMatrix(L)
+        print("\n\n")
 
-    print("Result of LU decomposition:" )
-    print("A: ")
-    printMatrix(A)
-    print("U: ")
-    printMatrix(U)
-    print("L: ")
-    printMatrix(L)
-    print("P: ")
-    printMatrix(getPmatrix(p))
-    print(p)
-    return A
+    return A, L, U, p
 
-#еденичная матрица
+#единичная матрица
 def swapRows(matrix, i, j):
     temp = matrix[i]
     matrix[i] = matrix[j]
@@ -118,4 +122,18 @@ def swapRows(matrix, i, j):
 filepath = "files/"
 filename = "test_1.txt"
 A = readMatrixFromFile(filepath + filename) #матрица A
-LU(A)
+A, L, U, p = LU(A)
+
+print("Result of LU decomposition:" )
+print("A: ")
+printMatrix(A)
+print("U: ")
+printMatrix(U)
+print("L: ")
+printMatrix(L)
+print("P: ")
+printMatrix(getPmatrix(p))
+print(p)
+
+rank = getRankMatrixFromU(U)
+print("Rank = {}".format(rank))
