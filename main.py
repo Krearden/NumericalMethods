@@ -75,7 +75,6 @@ def computeDeterminantFromL(L, sign):
 def LU(A):
     n = len(A)
     p = list([i for i in range(n)]) #вектор перестановок
-    vector_p = [0, 1, 2, 3]
     L = list([[0  for j in range(n)] for i in range(n)])
     U = list([[A[i][j]  for j in range(n)] for i in range(n)])
     sign = 1
@@ -125,6 +124,31 @@ def checkIfCorrectLU(A, L, U, p):
 
     return matrixSubtraction(LU, PA)
 
+
+#forward substitution
+def forwardSubstitution(L, b):
+    n = len(L)
+    y = [0 for i in range(n)]
+    for i in range(n):
+        summ = 0
+        for j in range(i):
+            summ += L[i][j] * y[j]
+        y[i] = (b[i] - summ) / L[i][i]
+
+    return y
+
+
+#backward substitution Есть ошибка
+def backwardSubstitution(U, y):
+    n = len(L)
+    x = [0 for i in range(n)]
+    for i in range(n - 1, -1, -1):
+        summ = 0
+        # for j in range(n - 1 - i, -1, -1):
+        #     summ += U[i][j] * x[j]
+        # x[i] = (y[i] - summ) / U[i][i]
+    return x
+
 #MAIN
 filepath = "files/"
 filename = "test_1.txt"
@@ -151,3 +175,15 @@ print("Rank = {}".format(rank))
 
 determinant = computeDeterminantFromL(L, sign)
 print("Determinant = {}".format(determinant))
+
+b = multipMatrixByVector(A, [1, 2, 3, 4])
+b = multipMatrixByVector(getPmatrix(p), b)
+y = forwardSubstitution(L, b)
+test = multipMatrixByVector(L, y)
+
+print(y)
+print(test)
+print(b)
+
+x = backwardSubstitution(U, y)
+print(x)
