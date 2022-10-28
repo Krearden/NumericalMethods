@@ -144,9 +144,9 @@ def backwardSubstitution(U, y):
     x = [0 for i in range(n)]
     for i in range(n - 1, -1, -1):
         summ = 0
-        # for j in range(n - 1 - i, -1, -1):
-        #     summ += U[i][j] * x[j]
-        # x[i] = (y[i] - summ) / U[i][i]
+        for j in range(n - 1, i - 1, -1):
+            summ += U[i][j] * x[j]
+        x[i] = (y[i] - summ) / U[i][i]
     return x
 
 #MAIN
