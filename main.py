@@ -138,7 +138,7 @@ def forwardSubstitution(L, b):
     return y
 
 
-#backward substitution Есть ошибка
+#backward substitution
 def backwardSubstitution(U, y):
     n = len(L)
     x = [0 for i in range(n)]
@@ -148,6 +148,21 @@ def backwardSubstitution(U, y):
             summ += U[i][j] * x[j]
         x[i] = (y[i] - summ) / U[i][i]
     return x
+
+#get inverse matirx Есть ошибка!
+def getInverseMatrix(A, p):
+    n = len(A)
+    A_inverse = [[0 for i in range(n)] for j in range(n)]
+    for i in range(n):
+        e_i = [1 if j == i else 0 for j in range(n)]
+        e_i = multipMatrixByVector(getPmatrix(p), e_i)
+        y = forwardSubstitution(L, e_i)
+        x = backwardSubstitution(U, y)
+        for k in range(n):
+            A_inverse[k][i] = x[k]
+        print(x)
+        # A_inverse.append(x)
+    return A_inverse
 
 #MAIN
 filepath = "files/"
@@ -164,26 +179,43 @@ print("L: ")
 printMatrix(L)
 print("P: ")
 printMatrix(getPmatrix(p))
+print()
+print("Vector p:")
 print(p)
 
+print()
 print("Check if LU decomposition is correct (L*U-P*A): ")
 should_be_zeros = checkIfCorrectLU(A, L, U, p)
 printMatrix(should_be_zeros, True)
 
 rank = getRankMatrixFromU(U)
+print()
 print("Rank = {}".format(rank))
 
 determinant = computeDeterminantFromL(L, sign)
+print()
 print("Determinant = {}".format(determinant))
 
+#find x
+print()
+print("x (found): ")
 b = multipMatrixByVector(A, [1, 2, 3, 4])
 b = multipMatrixByVector(getPmatrix(p), b)
 y = forwardSubstitution(L, b)
-test = multipMatrixByVector(L, y)
-
-print(y)
-print(test)
-print(b)
-
 x = backwardSubstitution(U, y)
 print(x)
+
+#inverse matirx
+print()
+print("A^(-1):")
+A_inverse = getInverseMatrix(A, p)
+
+#A*A^(-1)-E
+print()
+print("A*A^(-1)-E")
+n = len(A)
+E = [[1 if i == j else 0 for i in range(n)] for j in range(n)]
+whatever = matrixSubtraction(multiplyMatrix(A, A_inverse), E)
+printMatrix(whatever, True)
+
+
