@@ -149,7 +149,7 @@ def backwardSubstitution(U, y):
         x[i] = (y[i] - summ) / U[i][i]
     return x
 
-#get inverse matirx Есть ошибка!
+#get inverse matirx
 def getInverseMatrix(A, p):
     n = len(A)
     A_inverse = [[0 for i in range(n)] for j in range(n)]
@@ -160,9 +160,35 @@ def getInverseMatrix(A, p):
         x = backwardSubstitution(U, y)
         for k in range(n):
             A_inverse[k][i] = x[k]
-        print(x)
-        # A_inverse.append(x)
     return A_inverse
+
+#getFirstNorma of matrix
+def getFirstNorma(A):
+    n = len(A)
+    summ = 0
+    max_summ = 0
+    for i in range(n):
+        for j in range(n):
+            summ += abs(A[i][j])
+        if summ > max_summ:
+            max_summ = summ
+        summ = 0
+    return max_summ
+
+#getSecondNorma of matrix
+def getSecondNorma(A):
+    n = len(A)
+    summ = 0
+    max_summ = 0
+    for i in range(n):
+        for j in range(n):
+            summ += abs(A[j][i])
+        if summ > max_summ:
+            max_summ = summ
+        summ = 0
+    return max_summ
+
+
 
 #MAIN
 filepath = "files/"
@@ -209,6 +235,7 @@ print(x)
 print()
 print("A^(-1):")
 A_inverse = getInverseMatrix(A, p)
+printMatrix(A_inverse)
 
 #A*A^(-1)-E
 print()
@@ -218,4 +245,16 @@ E = [[1 if i == j else 0 for i in range(n)] for j in range(n)]
 whatever = matrixSubtraction(multiplyMatrix(A, A_inverse), E)
 printMatrix(whatever, True)
 
+#normas
+print()
+print("Число обусловленности в трех нормах:")
+first_norma_A = getFirstNorma(A)
+first_norma_A_inverse = getFirstNorma(A_inverse)
+uno = first_norma_A * first_norma_A_inverse
+print("Норма 1: {:10.6f}".format(uno))
+
+second_norma_A = getSecondNorma(A)
+second_norma_A_inverse = getSecondNorma(A_inverse)
+dos = second_norma_A * second_norma_A_inverse
+print("Норма 2: {:10.6f}".format(dos))
 
