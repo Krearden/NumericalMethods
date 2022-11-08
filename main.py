@@ -49,18 +49,18 @@ def getPmatrix(p):
         P[i][p[i]] = 1
     return P
 
-def getRankMatrixFromU(U):
-    n = len(U)
-    temp = 0
-    rank = 0
-    for i in range(n):
-        for j in range(n):
-            temp += U[i][j]
-        if (temp != 0):
-            rank += 1
-        temp = 0
-
-    return rank
+# def getRankMatrixFromU(U):
+#     n = len(U)
+#     temp = 0
+#     rank = 0
+#     for i in range(n):
+#         for j in range(n):
+#             temp += U[i][j]
+#         if (temp != 0):
+#             rank += 1
+#         temp = 0
+#
+#     return rank
 
 def computeDeterminantFromL(L, sign):
     n = len(L)
@@ -78,6 +78,8 @@ def LU(A):
     L = list([[0  for j in range(n)] for i in range(n)])
     U = list([[A[i][j]  for j in range(n)] for i in range(n)])
     sign = 1
+    epsilon = 1e-06
+    rank = 0
 
     for i in range(n):
         #находим главный элемент в столбце i и меняем строки местами
@@ -87,6 +89,8 @@ def LU(A):
             if(abs(U[k][i]) > max_el):
                 max_el = abs(U[k][i])
                 max_el_row_index = k
+        if (max_el > epsilon):
+            rank += 1
         if (max_el != 0 and max_el_row_index != i):
             p = swapRows(p, i, max_el_row_index)
             U = swapRows(U, i, max_el_row_index)
@@ -115,7 +119,7 @@ def LU(A):
         printMatrix(L)
         print("\n\n")
 
-    return A, L, U, p, sign
+    return A, L, U, p, sign, rank
 
 def checkIfCorrectLU(A, L, U, p):
     P = getPmatrix(p)
@@ -194,7 +198,7 @@ def getSecondNorma(A):
 filepath = "files/"
 filename = "test_1.txt"
 A = readMatrixFromFile(filepath + filename) #матрица A
-A, L, U, p, sign = LU(A)
+A, L, U, p, sign, rank = LU(A)
 
 print("Result of LU decomposition:" )
 print("A: ")
@@ -214,7 +218,6 @@ print("Check if LU decomposition is correct (L*U-P*A): ")
 should_be_zeros = checkIfCorrectLU(A, L, U, p)
 printMatrix(should_be_zeros, True)
 
-rank = getRankMatrixFromU(U)
 print()
 print("Rank = {}".format(rank))
 
