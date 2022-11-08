@@ -1,5 +1,6 @@
 #coding=utf-8
 from matrixMethods import *
+import math
 
 # Лабораторная работа № 2 на тему «Прямые методы решения систем линейных алгебраических уравнений»
 # Выполнили Запорожченко Кирилл и Педаев Михаил (ФЗ-11)
@@ -192,7 +193,99 @@ def getSecondNorma(A):
         summ = 0
     return max_summ
 
+#getSummOfMultiplyOfNonDiagonalElements
+def getSummOfMultiplyOfNonDiagonalElements(A):
+    summ = 0.0
+    n = len(A)
+    for i in range(n):
+        for j in range(i + 1, n):
+            summ += A[i][j] * A[i][j]
+    summ *= 2
+    return summ
 
+#find max matrix element (module) which is not on the diagonal
+def getMaxNonDiagonalElement(A):
+    n = len(A)
+    max_el = 0.0
+    max_el_i = max_el_j = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            if (abs(A[i][j] > max_el)):
+                max_el = abs(A[i][j])
+                max_el_i = i
+                max_el_j = j
+    return max_el_i, max_el_j
+
+#get transposed matrix
+def getTransposedMatrix(A):
+    n = len(A)
+    A_transposed = [[A[j][i] for j in range(n)] for i in range(n)]
+    return A_transposed
+
+#get eucledian norm
+def getEucledianNorm(A):
+    n = len(A)
+    epsilon = 1e-06
+    A = multiplyMatrix(getTransposedMatrix(A), A)
+    max_a = abs(A[0][1])
+    A_new = [[A[i][j] for j in range(n)] for i in range(n)]
+    while (max_a > epsilon):
+        ii = 0
+        jj = 1
+        for i in range(n):
+            for j in range(i):
+                if (abs(A[i][j] > max_a)):
+                    max_a = abs(A[i][j])
+                    ii = i
+                    jj = j
+
+        arctan_half = 0.5 * math.atan(2 * A[ii][jj] / (A[ii][ii] - A[jj][jj]))
+        s = math.sin(arctan_half)
+        c = math.cos(arctan_half)
+
+        for m in range(n):
+            if (m != ii and m != jj):
+                A_new[m][ii] = A_new[ii][m] = c * A[ii][m] + s * A[jj][m]
+                A_new[m][jj] = A_new[jj][m] = -s * A[ii][m] + c * A[jj][m]
+
+        A_new[ii][ii] = c * c * A[ii][ii] + 2 * s * c * A[ii][jj] + s * s * A[jj][jj]
+        A_new[jj][jj] = s * s * A[ii][ii] - 2 * s * c * A[ii][jj] + c * c * A[jj][jj]
+        A_new[ii][jj] = A_new[jj][ii] = (c * c - s * s) * A[ii][jj] + s * c * (A[jj][jj] - A[ii][ii])
+
+        A = [[A_new[i][j] for j in range(n)] for i in range(n)]
+    return A
+
+# #get eucledian norm
+# def getEucledianNorm(A):
+#     n = len(A)
+#     epsilon = 1e-06
+#     max_diagonal_element = 0.0
+#     AAT = multiplyMatrix(getTransposedMatrix(A), A)
+#     while (math.sqrt(getSummOfMultiplyOfNonDiagonalElements(AAT)) > epsilon):
+#         print(getSummOfMultiplyOfNonDiagonalElements(AAT), math.sqrt(max_diagonal_element))
+#         max_el_i, max_el_j = getMaxNonDiagonalElement(AAT)
+#         if (AAT[max_el_i][max_el_i] == AAT[max_el_j][max_el_j]):
+#             theta = math.pi / 4
+#         else:
+#             theta = math.atan(2 * A[max_el_i][max_el_j] / (A[max_el_i][max_el_i] - A[max_el_j][max_el_j])) / 2
+#         C = math.cos(theta)
+#         S = math.sin(theta)
+#         B = [[AAT[i][j] for j in range(n)] for i in range(n)]
+#
+#         for k in range(n):
+#             B[k][max_el_i] = C * AAT[k][max_el_i] + S * AAT[k][max_el_j]
+#             B[k][max_el_j] = -S * AAT[k][max_el_i] + C * AAT[k][max_el_j]
+#         for k in range(n):
+#             AAT[max_el_i][k] = AAT[k][max_el_i] = C * B[max_el_i][k] + S * B[max_el_j][k]
+#             AAT[max_el_j][k] = AAT[k][max_el_j] = -S * B[max_el_i][k] + C * B[max_el_j][k]
+#
+#         AAT[max_el_i][max_el_j] = AAT[max_el_j][max_el_i] = 0
+#
+#     for i in range(n):
+#         if (abs(AAT[i][i]) > max_diagonal_element):
+#             max_diagonal_element = abs(AAT[i][i])
+#
+#     return math.sqrt(max_diagonal_element)
 
 #MAIN
 filepath = "files/"
@@ -261,3 +354,9 @@ second_norma_A_inverse = getSecondNorma(A_inverse)
 dos = second_norma_A * second_norma_A_inverse
 print("Норма 2: {:10.6f}".format(dos))
 
+
+printMatrix(getEucledianNorm(A))
+# third_norma_A = getEucledianNorm(A)
+# third_norma_A_inverse = getEucledianNorm(A_inverse)
+# tres = third_norma_A * third_norma_A_inverse
+# print("Евклидова норма: {:10.6f}".format(tres))
