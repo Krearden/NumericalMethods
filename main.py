@@ -230,6 +230,8 @@ def getEucledianNorm(A):
     max_a = abs(A[0][1])
     A_new = [[A[i][j] for j in range(n)] for i in range(n)]
     while (max_a > epsilon):
+        # print(max_a)
+        max_a = abs(A[0][1])
         ii = 0
         jj = 1
         for i in range(n):
@@ -253,7 +255,14 @@ def getEucledianNorm(A):
         A_new[ii][jj] = A_new[jj][ii] = (c * c - s * s) * A[ii][jj] + s * c * (A[jj][jj] - A[ii][ii])
 
         A = [[A_new[i][j] for j in range(n)] for i in range(n)]
-    return A
+
+    max_diagonal = 0
+    for i in range(n):
+        for j in range(n):
+            if (abs(A[i][j] > max_diagonal)):
+                max_diagonal = abs(A[i][j])
+
+    return math.sqrt(max_diagonal)
 
 # #get eucledian norm
 # def getEucledianNorm(A):
@@ -355,8 +364,7 @@ dos = second_norma_A * second_norma_A_inverse
 print("Норма 2: {:10.6f}".format(dos))
 
 
-printMatrix(getEucledianNorm(A))
-# third_norma_A = getEucledianNorm(A)
-# third_norma_A_inverse = getEucledianNorm(A_inverse)
-# tres = third_norma_A * third_norma_A_inverse
-# print("Евклидова норма: {:10.6f}".format(tres))
+third_norma_A = getEucledianNorm(A)
+third_norma_A_inverse = getEucledianNorm(A_inverse)
+tres = third_norma_A * third_norma_A_inverse
+print("Евклидова норма: {:10.6f}".format(tres))
