@@ -28,7 +28,10 @@ def printMatrix(matrix, accuracy = False):
         for row in matrix:
             for element in row:
                 if accuracy:
-                    print("{:10.20f} ".format(element), end="")
+                    if (element == 0):
+                        print("{:10.14f}  ".format(element), end="")
+                    else:
+                        print("{:.14}  ".format(element), end="")
                 else:
                     print("{:10.6f} ".format(element), end="")
             print()
@@ -264,12 +267,22 @@ def getEucledianNorm(A):
 
     return math.sqrt(max_diagonal)
 
+# def vectorSubstraction(vector_one, vector_two):
+#     n = len(vector_one)
+#     if (n == len(vector_two)):
+#         result = [0 for i in range(n)]
+#         for i in range(n):
+#             result[i] = vector_one[i] - vector_two[i]
+#         return result
+#     else:
+#         return
 
 #MAIN
 filepath = "files/"
-filename = "var_27_b.txt"
+filename = "test_1.txt"
 A = readMatrixFromFile(filepath + filename) #матрица A
 A, L, U, p, sign, rank = LU(A)
+n = len(A)
 
 print("Result of LU decomposition:" )
 print("A: ")
@@ -336,3 +349,16 @@ third_norma_A = getEucledianNorm(A)
 third_norma_A_inverse = getEucledianNorm(A_inverse)
 tres = third_norma_A * third_norma_A_inverse
 print("Евклидова норма: {:10.6f}".format(tres))
+
+# print()
+# print("A*x-b:")
+# whatever2 = vectorSubstraction(multipMatrixByVector(A, x), b)
+# for i in range(n):
+#     print("{:.14} ".format(whatever2[i]), end='')
+
+print()
+print("Погрешность нахождения x: ")
+given_x = [1, 2, 3, 4]
+temp = [given_x[i] - x[i] for i in range(n)]
+for i in range(n):
+    print("{:.14} ".format(temp[i]), end='')
