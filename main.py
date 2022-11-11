@@ -22,6 +22,7 @@ def readMatrixFromFile(filename):
             row = []
     return matrix
 
+
 #print matrix on the screen
 def printMatrix(matrix, accuracy = False):
     if matrix:
@@ -38,12 +39,31 @@ def printMatrix(matrix, accuracy = False):
     else:
         print("Empty matrix given")
 
+
+#print matrix on the screen
+def writeMatrix(matrix, output, accuracy = False):
+    if matrix:
+        for row in matrix:
+            output.write("\n")
+            for element in row:
+                if accuracy:
+                    if (element == 0):
+                        output.write("{:10.14f}  ".format(element))
+                    else:
+                        output.write("{:.14}  ".format(element))
+                else:
+                    output.write("{:10.6f} ".format(element))
+    else:
+        output_file.write("Empty matrix given")
+
+
 #единичная матрица
 def swapRows(matrix, i, j):
     temp = matrix[i]
     matrix[i] = matrix[j]
     matrix[j] = temp
     return matrix
+
 
 #get P matrix from p vector
 def getPmatrix(p):
@@ -53,6 +73,7 @@ def getPmatrix(p):
         P[i][p[i]] = 1
     return P
 
+
 def computeDeterminantFromL(L, sign):
     n = len(L)
     det = 1
@@ -61,8 +82,9 @@ def computeDeterminantFromL(L, sign):
     det *= sign
     return det
 
+
 #LU
-def LU(A):
+def LU(A, output_file):
     n = len(A)
     p = list([i for i in range(n)]) #вектор перестановок
     L = list([[0  for j in range(n)] for i in range(n)])
@@ -105,17 +127,26 @@ def LU(A):
         print("i = {}; max_el_row_index = {};".format(i, max_el_row_index))
         print("U: ")
         printMatrix(U)
+        #write
+        output_file.write("\ni = {}; max_el_row_index = {};".format(i, max_el_row_index))
+        output_file.write("\nU: ")
+        writeMatrix(U, output_file)
+
         print("L: ")
+        output_file.write("\nL: ")
         printMatrix(L)
-        print("\n\n")
+        writeMatrix(L, output_file)
+        output_file.write("\n")
 
     return A, L, U, p, sign, rank
+
 
 def checkIfCorrectLU(A, L, U, p):
     P = getPmatrix(p)
     LU = multiplyMatrix(L, U)
     PA = multiplyMatrix(P, A)
     return matrixSubtraction(LU, PA)
+
 
 #forward substitution
 def forwardSubstitution(L, b):
@@ -128,6 +159,7 @@ def forwardSubstitution(L, b):
         y[i] = (b[i] - summ) / L[i][i]
     return y
 
+
 #backward substitution
 def backwardSubstitution(U, y):
     n = len(L)
@@ -138,6 +170,7 @@ def backwardSubstitution(U, y):
             summ += U[i][j] * x[j]
         x[i] = (y[i] - summ) / U[i][i]
     return x
+
 
 #get inverse matirx
 def getInverseMatrix(A, p):
@@ -152,6 +185,7 @@ def getInverseMatrix(A, p):
             A_inverse[k][i] = x[k]
     return A_inverse
 
+
 #getFirstNorma of matrix
 def getFirstNorma(A):
     n = len(A)
@@ -165,6 +199,7 @@ def getFirstNorma(A):
         summ = 0
     return max_summ
 
+
 #getSecondNorma of matrix
 def getSecondNorma(A):
     n = len(A)
@@ -177,6 +212,7 @@ def getSecondNorma(A):
             max_summ = summ
         summ = 0
     return max_summ
+
 
 #find max matrix element (module) which is not on the diagonal
 def getMaxNonDiagonalElement(A):
@@ -192,11 +228,13 @@ def getMaxNonDiagonalElement(A):
                 max_el_j = j
     return max_el_i, max_el_j
 
+
 #get transposed matrix
 def getTransposedMatrix(A):
     n = len(A)
     A_transposed = [[A[j][i] for j in range(n)] for i in range(n)]
     return A_transposed
+
 
 #get eucledian norm
 def getEucledianNorm(A):
@@ -210,7 +248,7 @@ def getEucledianNorm(A):
         I = 0
         J = 1
         for i in range(n):
-            for j in range(i):
+            for j in range(i + 1, n):
                 if (abs(A[i][j]) > max_non_diag):
                     max_non_diag = abs(A[i][j])
                     I = i
@@ -232,7 +270,6 @@ def getEucledianNorm(A):
         A_copy[I][J] = (c * c - s * s) * A[I][J] + s * c * (A[J][J] - A[I][I])
         A_copy[J][I] = (c * c - s * s) * A[I][J] + s * c * (A[J][J] - A[I][I])
 
-
         A = [[A_copy[i][j] for j in range(n)] for i in range(n)]
 
     max_diagonal = 0
@@ -241,6 +278,7 @@ def getEucledianNorm(A):
             max_diagonal = abs(A[i][i])
 
     return math.sqrt(max_diagonal)
+
 
 def vectorSubstraction(vector_one, vector_two):
     if (len(vector_one) == len(vector_two)):
@@ -253,87 +291,148 @@ def vectorSubstraction(vector_one, vector_two):
 
 #MAIN
 filepath = "files/"
-filename = "test_1.txt"
-A = readMatrixFromFile(filepath + filename) #матрица A
-A, L, U, p, sign, rank = LU(A)
-n = len(A)
+filenames = ["var_18_b.txt", "var_27_b.txt"]
+output_filename = "lr2_output.txt"
+output_file = open(output_filename, "w")
+output_file.write("Запорожченко, Педаев. ЛР2.")
+for filename in filenames:
+    print("\n\n")
+    print(filename)
+    output_file.write("\n\n\n")
+    output_file.write("\n" + filename)
 
-print("Result of LU decomposition:" )
-print("A: ")
-printMatrix(A)
-print("U: ")
-printMatrix(U)
-print("L: ")
-printMatrix(L)
-print("P: ")
-printMatrix(getPmatrix(p))
-print()
-print("Vector p:")
-print(p)
+    A = readMatrixFromFile(filepath + filename) #матрица A
+    A, L, U, p, sign, rank = LU(A, output_file)
+    n = len(A)
 
-print()
-print("Check if LU decomposition is correct (L*U-P*A): ")
-should_be_zeros = checkIfCorrectLU(A, L, U, p)
-printMatrix(should_be_zeros, True)
+    print("\nResult of LU decomposition:" )
+    print("A: ")
+    printMatrix(A)
+    print("U: ")
+    printMatrix(U)
+    print("L: ")
+    printMatrix(L)
+    print("P: ")
+    printMatrix(getPmatrix(p))
+    print()
+    print("Vector p:")
+    print(p)
+    #write
+    output_file.write("\nResult of LU decomposition:")
+    output_file.write("\nA: ")
+    writeMatrix(A, output_file)
+    output_file.write("\nU: ")
+    writeMatrix(U, output_file)
+    output_file.write("\nL: ")
+    writeMatrix(L, output_file)
+    output_file.write("\nP: ")
+    writeMatrix(getPmatrix(p), output_file)
+    output_file.write("\n")
+    output_file.write("\nVector p:")
+    output_file.write("\n" + str(p))
 
-print()
-print("Rank = {}".format(rank))
+    print()
+    print("Check if LU decomposition is correct (L*U-P*A): ")
+    should_be_zeros = checkIfCorrectLU(A, L, U, p)
+    printMatrix(should_be_zeros, True)
+    #write
+    output_file.write("\n")
+    output_file.write("\nCheck if LU decomposition is correct (L*U-P*A): ")
+    writeMatrix(should_be_zeros, output_file, True)
 
-determinant = computeDeterminantFromL(L, sign)
-print()
-print("Determinant = {}".format(determinant))
+    print()
+    print("Rank = {}".format(rank))
+    #write
+    output_file.write("\n")
+    output_file.write("\nRank = {}".format(rank))
 
-#find x
-print()
-print("x (found): ")
-b = multipMatrixByVector(A, [1, 2, 3, 4])
-b = multipMatrixByVector(getPmatrix(p), b)
-y = forwardSubstitution(L, b)
-x = backwardSubstitution(U, y)
-print(x)
+    determinant = computeDeterminantFromL(L, sign)
+    print()
+    print("Determinant = {}".format(determinant))
+    #write
+    output_file.write("\n")
+    output_file.write("\nDeterminant = {}".format(determinant))
 
-#inverse matirx
-print()
-print("A^(-1):")
-A_inverse = getInverseMatrix(A, p)
-printMatrix(A_inverse)
+    #find x
+    print()
+    print("x (found): ")
+    b = multipMatrixByVector(A, [1, 2, 3, 4])
+    b = multipMatrixByVector(getPmatrix(p), b)
+    y = forwardSubstitution(L, b)
+    x = backwardSubstitution(U, y)
+    print(x)
+    #write
+    output_file.write("\n")
+    output_file.write("\nx (found): ")
+    output_file.write("\n" + str(x))
 
-#A*A^(-1)-E
-print()
-print("A*A^(-1)-E")
-n = len(A)
-E = [[1 if i == j else 0 for i in range(n)] for j in range(n)]
-whatever = matrixSubtraction(multiplyMatrix(A, A_inverse), E)
-printMatrix(whatever, True)
+    #inverse matirx
+    print()
+    print("A^(-1):")
+    A_inverse = getInverseMatrix(A, p)
+    printMatrix(A_inverse)
+    #write
+    output_file.write("\n")
+    output_file.write("\nA^(-1):")
+    writeMatrix(A_inverse, output_file)
 
-#normas
-print()
-print("Число обусловленности в трех нормах:")
-first_norma_A = getFirstNorma(A)
-first_norma_A_inverse = getFirstNorma(A_inverse)
-uno = first_norma_A * first_norma_A_inverse
-print("Норма 1: {:10.6f}".format(uno))
+    #A*A^(-1)-E
+    print()
+    print("A*A^(-1)-E")
+    n = len(A)
+    E = [[1 if i == j else 0 for i in range(n)] for j in range(n)]
+    whatever = matrixSubtraction(multiplyMatrix(A, A_inverse), E)
+    printMatrix(whatever, True)
+    #write
+    output_file.write("\n")
+    output_file.write("\nA*A^(-1)-E")
+    writeMatrix(whatever, output_file,  True)
 
-second_norma_A = getSecondNorma(A)
-second_norma_A_inverse = getSecondNorma(A_inverse)
-dos = second_norma_A * second_norma_A_inverse
-print("Норма 2: {:10.6f}".format(dos))
+    #normas
+    print()
+    print("Число обусловленности в трех нормах:")
+    first_norma_A = getFirstNorma(A)
+    first_norma_A_inverse = getFirstNorma(A_inverse)
+    uno = first_norma_A * first_norma_A_inverse
+    print("Норма 1: {:10.6f}".format(uno))
+    #write
+    output_file.write("\n")
+    output_file.write("\nЧисло обусловленности в трех нормах:")
+    output_file.write("\nНорма 1: {:10.6f}".format(uno))
 
-third_norma_A = getEucledianNorm(A)
-third_norma_A_inverse = getEucledianNorm(A_inverse)
-tres = third_norma_A * third_norma_A_inverse
-print("Евклидова норма: {:10.6f}".format(tres))
+    second_norma_A = getSecondNorma(A)
+    second_norma_A_inverse = getSecondNorma(A_inverse)
+    dos = second_norma_A * second_norma_A_inverse
+    print("Норма 2: {:10.6f}".format(dos))
+    #write
+    output_file.write("\nНорма 2: {:10.6f}".format(dos))
 
-print()
-print("A*x-b:")
-b = multipMatrixByVector(A, [1, 2, 3, 4])
-whatever2 = vectorSubstraction(multipMatrixByVector(A, x), b)
-for i in range(n):
-    print("{:.14} ".format(whatever2[i]), end='')
+    third_norma_A = getEucledianNorm(A)
+    third_norma_A_inverse = getEucledianNorm(A_inverse)
+    tres = third_norma_A * third_norma_A_inverse
+    print("Евклидова норма: {:10.6f}".format(tres))
+    #write
+    output_file.write("\nЕвклидова норма: {:10.6f}".format(tres))
 
-print("\n")
-print("Погрешность нахождения x: ")
-given_x = [1, 2, 3, 4]
-temp = [given_x[i] - x[i] for i in range(n)]
-for i in range(n):
-    print("{:.14} ".format(temp[i]), end='')
+    #невязка
+    print()
+    print("A*x-b:")
+    output_file.write("\n")
+    output_file.write("\nA*x-b:\n")
+    b = multipMatrixByVector(A, [1, 2, 3, 4])
+    whatever2 = vectorSubstraction(multipMatrixByVector(A, x), b)
+    for i in range(n):
+        print("{:.14} ".format(whatever2[i]), end='')
+        output_file.write("{:.14} ".format(whatever2[i]))
+
+    print("\n")
+    print("Погрешность нахождения x: ")
+    output_file.write("\n")
+    output_file.write("\nПогрешность нахождения x:\n")
+    given_x = [1, 2, 3, 4]
+    temp = [given_x[i] - x[i] for i in range(n)]
+    for i in range(n):
+        print("{:.14} ".format(temp[i]), end='')
+        output_file.write("{:.14} ".format(temp[i]))
+
+output_file.close()
