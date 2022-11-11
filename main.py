@@ -53,26 +53,12 @@ def getPmatrix(p):
         P[i][p[i]] = 1
     return P
 
-# def getRankMatrixFromU(U):
-#     n = len(U)
-#     temp = 0
-#     rank = 0
-#     for i in range(n):
-#         for j in range(n):
-#             temp += U[i][j]
-#         if (temp != 0):
-#             rank += 1
-#         temp = 0
-#
-#     return rank
-
 def computeDeterminantFromL(L, sign):
     n = len(L)
     det = 1
     for i in range(n):
         det *= L[i][i]
     det *= sign
-
     return det
 
 #LU
@@ -129,9 +115,7 @@ def checkIfCorrectLU(A, L, U, p):
     P = getPmatrix(p)
     LU = multiplyMatrix(L, U)
     PA = multiplyMatrix(P, A)
-
     return matrixSubtraction(LU, PA)
-
 
 #forward substitution
 def forwardSubstitution(L, b):
@@ -142,9 +126,7 @@ def forwardSubstitution(L, b):
         for j in range(i):
             summ += L[i][j] * y[j]
         y[i] = (b[i] - summ) / L[i][i]
-
     return y
-
 
 #backward substitution
 def backwardSubstitution(U, y):
@@ -196,16 +178,6 @@ def getSecondNorma(A):
         summ = 0
     return max_summ
 
-# #getSummOfMultiplyOfNonDiagonalElements
-# def getSummOfMultiplyOfNonDiagonalElements(A):
-#     summ = 0.0
-#     n = len(A)
-#     for i in range(n):
-#         for j in range(i + 1, n):
-#             summ += A[i][j] * A[i][j]
-#     summ *= 2
-#     return summ
-
 #find max matrix element (module) which is not on the diagonal
 def getMaxNonDiagonalElement(A):
     n = len(A)
@@ -239,7 +211,7 @@ def getEucledianNorm(A):
         J = 1
         for i in range(n):
             for j in range(i):
-                if (abs(A[i][j] > max_non_diag)):
+                if (abs(A[i][j]) > max_non_diag):
                     max_non_diag = abs(A[i][j])
                     I = i
                     J = j
@@ -250,20 +222,23 @@ def getEucledianNorm(A):
 
         for m in range(n):
             if (m != I and m != J):
-                A_copy[m][I] = A_copy[I][m] = c * A[I][m] + s * A[J][m]
-                A_copy[m][J] = A_copy[J][m] = -s * A[I][m] + c * A[J][m]
+                A_copy[m][I] = c * A[I][m] + s * A[J][m]
+                A_copy[m][J] = -s * A[I][m] + c * A[J][m]
+                A_copy[I][m] = c * A[I][m] + s * A[J][m]
+                A_copy[J][m] = -s * A[I][m] + c * A[J][m]
 
         A_copy[I][I] = c * c * A[I][I] + 2 * s * c * A[I][J] + s * s * A[J][J]
         A_copy[J][J] = s * s * A[I][I] - 2 * s * c * A[I][J] + c * c * A[J][J]
-        A_copy[I][J] = A_copy[J][I] = (c * c - s * s) * A[I][J] + s * c * (A[J][J] - A[I][I])
+        A_copy[I][J] = (c * c - s * s) * A[I][J] + s * c * (A[J][J] - A[I][I])
+        A_copy[J][I] = (c * c - s * s) * A[I][J] + s * c * (A[J][J] - A[I][I])
+
 
         A = [[A_copy[i][j] for j in range(n)] for i in range(n)]
 
     max_diagonal = 0
     for i in range(n):
-        for j in range(n):
-            if (abs(A[i][j] > max_diagonal)):
-                max_diagonal = abs(A[i][j])
+        if (abs(A[i][i] > max_diagonal)):
+            max_diagonal = abs(A[i][i])
 
     return math.sqrt(max_diagonal)
 
