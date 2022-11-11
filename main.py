@@ -267,15 +267,14 @@ def getEucledianNorm(A):
 
     return math.sqrt(max_diagonal)
 
-# def vectorSubstraction(vector_one, vector_two):
-#     n = len(vector_one)
-#     if (n == len(vector_two)):
-#         result = [0 for i in range(n)]
-#         for i in range(n):
-#             result[i] = vector_one[i] - vector_two[i]
-#         return result
-#     else:
-#         return
+def vectorSubstraction(vector_one, vector_two):
+    if (len(vector_one) == len(vector_two)):
+        result = [0 for i in range(n)]
+        for i in range(len(vector_one)):
+            result[i] = vector_one[i] - vector_two[i]
+        return result
+    else:
+        return
 
 #MAIN
 filepath = "files/"
@@ -350,13 +349,14 @@ third_norma_A_inverse = getEucledianNorm(A_inverse)
 tres = third_norma_A * third_norma_A_inverse
 print("Евклидова норма: {:10.6f}".format(tres))
 
-# print()
-# print("A*x-b:")
-# whatever2 = vectorSubstraction(multipMatrixByVector(A, x), b)
-# for i in range(n):
-#     print("{:.14} ".format(whatever2[i]), end='')
-
 print()
+print("A*x-b:")
+b = multipMatrixByVector(A, [1, 2, 3, 4])
+whatever2 = vectorSubstraction(multipMatrixByVector(A, x), b)
+for i in range(n):
+    print("{:.14} ".format(whatever2[i]), end='')
+
+print("\n")
 print("Погрешность нахождения x: ")
 given_x = [1, 2, 3, 4]
 temp = [given_x[i] - x[i] for i in range(n)]
