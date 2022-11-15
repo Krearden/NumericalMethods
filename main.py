@@ -300,8 +300,10 @@ for filename in filenames:
     print(filename)
     output_file.write("\n\n\n")
     output_file.write("\n" + filename)
-
+    output_file.write("\nGiven matirx: ")
     A = readMatrixFromFile(filepath + filename) #матрица A
+    writeMatrix(A, output_file)
+    output_file.write("\n")
     A, L, U, p, sign, rank = LU(A, output_file)
     n = len(A)
 
