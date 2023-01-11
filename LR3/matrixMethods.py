@@ -9,6 +9,7 @@ def multipMatrixByVector(m, v):
 
     return rv
 
+
 #multiply Matrix by Matrix
 def multiplyMatrix(first_matrix, second_matrix):
     length = len(first_matrix) 
@@ -20,6 +21,7 @@ def multiplyMatrix(first_matrix, second_matrix):
 
     return result_matrix
 
+
 #substract Matrix from Matrix
 def matrixSubtraction(first_matrix, second_matrix):
     length = len(first_matrix)
@@ -29,6 +31,32 @@ def matrixSubtraction(first_matrix, second_matrix):
             result_matrix[i][j] = first_matrix[i][j] - second_matrix[i][j]
     
     return result_matrix
+
+
+def multiplyMatrixByNumber(first_matrix, number):
+    pass
+
+
+def MatrixPlusMatrix(first_matrix, second_matrix):
+    pass
+
+
+#get transposed matrix
+def getTransposedMatrix(A):
+    n = len(A)
+    A_transposed = [[A[j][i] for j in range(n)] for i in range(n)]
+    return A_transposed
+
+
+#compute determinant for 2x2 matrix
+def computeDeterminant(matrix):
+    return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+
+
+#get inverse matirx
+def getInverseMatrix(A):
+    pass
+
 
 if __name__ == "__main__":
     first_matrix = [
