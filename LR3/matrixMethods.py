@@ -20,6 +20,7 @@ def multiplyMatrix(first_matrix, second_matrix):
 
     return result_matrix
 
+#substract Matrix from Matrix
 def matrixSubtraction(first_matrix, second_matrix):
     length = len(first_matrix)
     result_matrix = [[0 for i in range(length)] for i in range(length)]
