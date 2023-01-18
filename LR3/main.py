@@ -1,10 +1,11 @@
 #coding=utf-8
 import math
 from matrixMethods import *
+from LU import *
 
 # Лабораторная работа № 3 на тему «Решение нелинейных уравнений»
 # Выполнили Запорожченко Кирилл и Педаев Михаил (ФЗ-11)
-# 2022 г.
+# 2023 г.
 
 
 #FUNCTIONS
@@ -72,4 +73,38 @@ def getEucledianNorm(A):
 def getEucledianVectorNorm(vector):
     pass
 
+
+#Jacobi marix
+def getJacobian():
+    pass
+
+
+#Derivative matrix - матрица производных для систем в неявном виде
+def getDerivativeMatrix(variant, x, y):
+    N = 2
+    dF = [[0 for i in range(N)] for i in range(N)]
+    #test variant
+    if (variant == 0):
+        dF[0][0] = math.cos(x) #f1 over x
+        dF[0][1] = 1 #f2 over x
+        dF[1][0] = 2 #f1 over y
+        dF[1][1] = -math.sin(y - 1) #f2 over y
+    else:
+        print("Пока здесь такого варианта нету")
+
+    return dF
+
+#Newton's method
+def methodNewton(X):
+    epsilon = 1e-04
+    N = len(X)
+    dF = getDerivativeMatrix(0, X[0], X[1])
+    dF_inverse = getInverseMatrix(dF)
+    xLast = [0 for i in range(N)]
+
+
+
+
 #MAIN
+X = [0, 0.8] # [0][0] is X and [0][1] is Y (примерные значения)
+methodNewton(X)
