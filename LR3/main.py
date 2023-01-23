@@ -117,7 +117,7 @@ def printHeader(method_name):
     if (method_name == "newton"):
         print("")
         print("+-NEWTON'S METHOD-----------------------------------------------------------------------------------+")
-        print("| Itr |      X      |      Y      |    Норма невязки    |          F1         |          F1         |")
+        print("| Itr |      X      |      Y      |    Норма невязки    |          F1         |          F2         |")
         print("+-----+-------------+-------------+---------------------+---------------------+---------------------+")
 
     elif (method_name == "iteration"):
@@ -128,7 +128,7 @@ def printHeader(method_name):
 
 #Newton's method
 def methodNewton(X, variant):
-    epsilon = 1e-04
+    epsilon = 1e-12
     iteration_counter = 1
     while (length(X, variant) > epsilon):
         #матрица производных
@@ -158,6 +158,12 @@ def methodNewton(X, variant):
         print("| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, X[0], X[1], length(X, variant), getFx(X, variant)[0], getFx(X, variant)[1]))
         iteration_counter += 1
     return X
+
+
+def methodGradient(X, variant):
+    epsilon = 1e-04
+
+
 
 
 #MAIN
