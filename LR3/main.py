@@ -115,9 +115,10 @@ def getDeterminant(matrix):
 
 def printHeader(method_name):
     if (method_name == "newton"):
-        print("--------------------------------------------------------------------------------------------------+\n")
-        print("Itr |      X      |      Y      |    Норма невязки    |          F1         |          F1         |\n")
-        print("----+-------------+-------------+---------------------+---------------------+---------------------+\n")
+        print("")
+        print("+-NEWTON'S METHOD-----------------------------------------------------------------------------------+")
+        print("| Itr |      X      |      Y      |    Норма невязки    |          F1         |          F1         |")
+        print("+-----+-------------+-------------+---------------------+---------------------+---------------------+")
 
     elif (method_name == "iteration"):
         pass
@@ -128,7 +129,7 @@ def printHeader(method_name):
 #Newton's method
 def methodNewton(X, variant):
     epsilon = 1e-04
-    iteration_counter = 0
+    iteration_counter = 1
     while (length(X, variant) > epsilon):
         #матрица производных
         dF = getDerivativeMatrix(variant, X[0], X[1])
@@ -154,14 +155,14 @@ def methodNewton(X, variant):
         #copy
         X = [newX[i] for i in range(len(dF))]
         #printinfo
-
+        print("| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, X[0], X[1], length(X, variant), getFx(X, variant)[0], getFx(X, variant)[1]))
         iteration_counter += 1
-    print(X)
     return X
 
 
 #MAIN
 X = [0, 0.8] # [0][0] is X and [0][1] is Y (примерные значения)
 printHeader("newton")
-methodNewton(X, 0)
-print("--------------------------------------------------------------------------------------------------+\n")
+X = methodNewton(X, 0)
+print("+---------------------------------------------------------------------------------------------------+\n")
+print(f"x = {X[0]}, y = {X[1]};")
