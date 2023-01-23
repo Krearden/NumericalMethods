@@ -76,12 +76,12 @@ def getJacobian():
 def getFx(X, variant):
     fX = [0 for i in range(len(X))]
     if (variant == 0):
-        X[0] = math.sin(X[0]) + 2 * X[1] - 1.6
-        X[1] = math.cos(X[1] - 1) + X[0] - 1
+        fX[0] = math.sin(X[0]) + 2 * X[1] - 1.6
+        fX[1] = math.cos(X[1] - 1) + X[0] - 1
     else:
         print("Такого еще нет варианта")
 
-    return X
+    return fX
 
 
 #Derivative matrix - матрица производных для систем в неявном виде
@@ -112,9 +112,23 @@ def getDeterminant(matrix):
     else:
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
 
+
+def printHeader(method_name):
+    if (method_name == "newton"):
+        print("--------------------------------------------------------------------------------------------------+\n")
+        print("Itr |      X      |      Y      |    Норма невязки    |          F1         |          F1         |\n")
+        print("----+-------------+-------------+---------------------+---------------------+---------------------+\n")
+
+    elif (method_name == "iteration"):
+        pass
+    elif (method_name == "gradient"):
+        pass
+
+
 #Newton's method
 def methodNewton(X, variant):
     epsilon = 1e-04
+    iteration_counter = 0
     while (length(X, variant) > epsilon):
         #матрица производных
         dF = getDerivativeMatrix(variant, X[0], X[1])
@@ -122,13 +136,14 @@ def methodNewton(X, variant):
         determinant = getDeterminant(dF)
         #fx
         Fx = getFx(X, variant)
+        n = len(dF)
         #for x
-        dF_x = [[dF[i] for i in range(len(dF))] for i in range(len(dF))]
+        dF_x = [[dF[j][i] for j in range(n)] for i in range(n)]
         dF_x[0][0] = Fx[0]
         dF_x[1][0] = Fx[1]
         determinant_x = getDeterminant(dF_x)
         #for y
-        dF_y = [[dF[i] for i in range(len(dF))] for i in range(len(dF))]
+        dF_y = [[dF[j][i] for j in range(n)] for i in range(n)]
         dF_y[0][1] = Fx[0]
         dF_y[1][1] = Fx[1]
         determinant_y = getDeterminant(dF_y)
@@ -138,9 +153,15 @@ def methodNewton(X, variant):
         newX[1] = X[1] - determinant_y / determinant #find new Y
         #copy
         X = [newX[i] for i in range(len(dF))]
+        #printinfo
+
+        iteration_counter += 1
     print(X)
     return X
 
+
 #MAIN
 X = [0, 0.8] # [0][0] is X and [0][1] is Y (примерные значения)
+printHeader("newton")
 methodNewton(X, 0)
+print("--------------------------------------------------------------------------------------------------+\n")
