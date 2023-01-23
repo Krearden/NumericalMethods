@@ -33,6 +33,17 @@ def matrixSubtraction(first_matrix, second_matrix):
     return result_matrix
 
 
+def vectorSubstraction(vector_one, vector_two):
+    n = len(vector_one)
+    if (len(vector_one) == len(vector_two)):
+        result = [0 for i in range(n)]
+        for i in range(len(vector_one)):
+            result[i] = vector_one[i] - vector_two[i]
+        return result
+    else:
+        return
+
+
 def multiplyMatrixByNumber(first_matrix, number):
     pass
 
@@ -51,11 +62,6 @@ def getTransposedMatrix(A):
 #compute determinant for 2x2 matrix
 def computeDeterminant(matrix):
     return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
-
-
-#get inverse matirx
-def getInverseMatrix(A):
-    pass
 
 
 if __name__ == "__main__":

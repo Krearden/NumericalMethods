@@ -78,6 +78,16 @@ def getEucledianVectorNorm(vector):
 def getJacobian():
     pass
 
+def getFx(X, variant):
+    fX = [0 for i in range(len(X))]
+    if (variant == 0):
+        X[0] = math.sin(X[0]) + 2 * X[1] - 1.6
+        X[1] = math.cos(X[1] - 1) + X[0] - 1
+    else:
+        print("Такого еще нет варианта")
+
+    return X
+
 
 #Derivative matrix - матрица производных для систем в неявном виде
 def getDerivativeMatrix(variant, x, y):
@@ -94,17 +104,33 @@ def getDerivativeMatrix(variant, x, y):
 
     return dF
 
-#Newton's method
-def methodNewton(X):
-    epsilon = 1e-04
-    N = len(X)
-    dF = getDerivativeMatrix(0, X[0], X[1])
-    dF_inverse = getInverseMatrix(dF)
-    xLast = [0 for i in range(N)]
 
+def timetostop(X, variant):
+    Fx = getFx(X, variant)
+    sqrt = math.sqrt(Fx[0] * Fx[0] + Fx[1] * Fx[1])
+    return sqrt
+
+
+#Newton's method
+def methodNewton(X, variant):
+    epsilon = 1e-04
+    iteration_counter = 0
+    N = len(X)
+    newX = [0 for i in range(N)]
+    while (timetostop(X, variant) > epsilon):
+        # #find derivative matrix ВООБЩЕ ЧЕ ТО НЕ ТО СЧИТАЕТ ЕМАЕ
+        dF = getDerivativeMatrix(0, X[0], X[1])
+        # dF_inverse = getInverseMatrix(dF)
+        # newX = vectorSubstraction(X, multipMatrixByVector(dF_inverse, getFx(X, variant)))
+        # X = [newX[i] for i in range(len(X))]
+        # iteration_counter += 1
+        # print(newX)
+        d = dF[0][0] * dF[1][1] - dF[1][0] * dF[0][1]
+        d_x = getFx(X, aaaaa!)
+        d_y =
 
 
 
 #MAIN
 X = [0, 0.8] # [0][0] is X and [0][1] is Y (примерные значения)
-methodNewton(X)
+methodNewton(X, 0)
