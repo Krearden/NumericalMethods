@@ -64,20 +64,15 @@ def getEucledianNorm(A):
     return math.sqrt(max_diagonal)
 
 
-#get eucledian norm of vector
-def getEucledianVectorNorm(vector):
-    pass
-
-
 #Jacobi marix
 def getJacobian():
     pass
 
-def getFx(X, variant):
-    fX = [0 for i in range(len(X))]
+def getFxy(XY, variant):
+    fX = [0 for i in range(len(XY))]
     if (variant == 0):
-        fX[0] = math.sin(X[0]) + 2 * X[1] - 1.6
-        fX[1] = math.cos(X[1] - 1) + X[0] - 1
+        fX[0] = math.sin(XY[0]) + 2 * XY[1] - 1.6
+        fX[1] = math.cos(XY[1] - 1) + XY[0] - 1
     else:
         print("Такого еще нет варианта")
 
@@ -100,10 +95,15 @@ def getDerivativeMatrix(variant, x, y):
     return dF
 
 
-def length(X, variant):
-    Fx = getFx(X, variant)
-    sqrt = math.sqrt(Fx[0] * Fx[0] + Fx[1] * Fx[1])
+#length() for newton method to stop
+def length(XY, variant):
+    Fxy = getFxy(XY, variant)
+    sqrt = math.sqrt(Fxy[0] * Fxy[0] + Fxy[1] * Fxy[1])
     return sqrt
+
+#len() for others to calculate pogreshnost'
+def leng(XY):
+    return math.sqrt(XY[0] * XY[0] + XY[1] * XY[1])
 
 
 def getDeterminant(matrix):
@@ -121,22 +121,28 @@ def printHeader(method_name):
         print("+-----+-------------+-------------+---------------------+---------------------+---------------------+")
 
     elif (method_name == "iteration"):
+        print("")
+        print("+-SIMPLE ITERATION METHOD-----------------------------------------------------------------------------------+")
         pass
     elif (method_name == "gradient"):
-        pass
+        print("")
+        print("+-GRADIENT METHOD-------------------------------------------------------------------+-----+")
+        print("| Itr |      X     |      Y     |  Alpha  |    Норма невязки   |     Погрешность    |  k  |")
+        print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
 
 
 #Newton's method
-def methodNewton(X, variant):
+def methodNewton(XY, variant):
     epsilon = 1e-12
-    iteration_counter = 1
-    while (length(X, variant) > epsilon):
+    iteration_counter = 0
+    while (length(XY, variant) > epsilon):
+        iteration_counter += 1
         #матрица производных
-        dF = getDerivativeMatrix(variant, X[0], X[1])
+        dF = getDerivativeMatrix(variant, XY[0], XY[1])
         #определители
         determinant = getDeterminant(dF)
         #fx
-        Fx = getFx(X, variant)
+        Fx = getFxy(XY, variant)
         n = len(dF)
         #for x
         dF_x = [[dF[j][i] for j in range(n)] for i in range(n)]
@@ -149,26 +155,76 @@ def methodNewton(X, variant):
         dF_y[1][1] = Fx[1]
         determinant_y = getDeterminant(dF_y)
         #find new x and y
-        newX = [0 for i in range(len(dF))]
-        newX[0] = X[0] - determinant_x / determinant #find new X
-        newX[1] = X[1] - determinant_y / determinant #find new Y
+        newXY = [0 for i in range(len(dF))]
+        newXY[0] = XY[0] - determinant_x / determinant #find new XY
+        newXY[1] = XY[1] - determinant_y / determinant #find new Y
         #copy
-        X = [newX[i] for i in range(len(dF))]
+        XY = [newXY[i] for i in range(len(dF))]
         #printinfo
-        print("| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, X[0], X[1], length(X, variant), getFx(X, variant)[0], getFx(X, variant)[1]))
-        iteration_counter += 1
-    return X
+        print("| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, XY[0], XY[1], length(XY, variant), getFxy(XY, variant)[0], getFxy(XY, variant)[1]))
+
+    return XY
 
 
-def methodGradient(X, variant):
+#func to find min
+def minimumFunction(XY, variant):
+    Fxy = getFxy(XY, variant) # Fx[0] - F1, Fx[1] - F2
+    return math.pow(Fxy[0], 2) + math.pow(Fxy[1], 2)
+
+
+def minimumFunctionDXDY(XY, variant):
+    Fxy = getFxy(XY, variant) # Fxy[0] - F1, Fxy[1] - F2
+    dF = getDerivativeMatrix(variant, XY[0], XY[1])
+    dx = 2 * Fxy[0] * dF[0][0] + 2 * Fxy[1] * dF[0][1]
+    dy = 2 * Fxy[0] * dF[1][0] + 2 * Fxy[1] * dF[1][1]
+    return [dx, dy]
+
+
+
+#get eucledian norm of vector
+def getEucledianVectorNorm(vector):
+    result = 0
+    for element in vector:
+        result += element * element
+    return math.sqrt(result)
+
+
+#метод Градиентного Спуска не работает - проблема в условии завершения
+def methodGradient(XY, variant, newtonXY):
     epsilon = 1e-04
-
+    timetostop = 1 + epsilon
+    iteration_counter = 0
+    while (timetostop > epsilon):
+        iteration_counter += 1
+        alpha = 1
+        lambdaa = 0.5
+        k = -1
+        min_func_dxdy = minimumFunctionDXDY(XY,variant)
+        #вычисляем значение переменной alpha адаптивным методом
+        while (minimumFunction([XY[0] - alpha * min_func_dxdy[0], XY[1] - alpha * min_func_dxdy[1]], variant) > minimumFunction(XY, variant)):
+            alpha *= lambdaa
+            k += 1
+        # find new x and y
+        newXY = [0 for i in range(len(XY))]
+        newXY[0] = XY[0] - alpha * min_func_dxdy[0] #new X
+        newXY[1] = XY[1] - alpha * min_func_dxdy[1] #new Y
+        #copy
+        XY = [newXY[i] for i in range(len(XY))]
+        timetostop = getEucledianVectorNorm(getFxy(XY, variant))
+        #printinfo
+        print("| {:3} | {:3.8f} | {:3.8f} | {:3.5f} | {:3.16f} | {:3.16f} | {:3} |".format(iteration_counter, XY[0], XY[1], alpha, timetostop, leng([XY[0] - newtonXY[0], XY[1] - newtonXY[1]]), k))
+    return XY
 
 
 
 #MAIN
-X = [0, 0.8] # [0][0] is X and [0][1] is Y (примерные значения)
+XY = [0, 0.8] # [0][0] is XY and [0][1] is Y (примерные значения)
 printHeader("newton")
-X = methodNewton(X, 0)
-print("+---------------------------------------------------------------------------------------------------+\n")
-print(f"x = {X[0]}, y = {X[1]};")
+newtonXY = methodNewton(XY, 0)
+print("+---------------------------------------------------------------------------------------------------+")
+print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
+
+printHeader("gradient")
+gXY = methodGradient(XY, 0, newtonXY)
+print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
+print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
