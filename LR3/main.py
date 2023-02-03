@@ -264,12 +264,12 @@ for i in range(len(variants)):
         XY = [0.5, -0.9]
     elif (variants[i] == 27):
         XY = [0.2, -0.7]
-    print(XY)
-    print("\n\n\nVARIANT {}".format(variants[i]))
+
+    print("\n\n\nVARIANT {}, {}".format(variants[i], XY))
     output_file.write("\n\nVARIANT {}".format(variants[i]))
     printHeader("newton")
     writeHeader("newton", output_file)
-    newtonXY = methodNewton(XY, 0, output_file)
+    newtonXY = methodNewton(XY, variants[i], output_file)
     print("+---------------------------------------------------------------------------------------------------+")
     print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
     output_file.write("\n+---------------------------------------------------------------------------------------------------+")
@@ -277,7 +277,7 @@ for i in range(len(variants)):
 
     printHeader("gradient")
     writeHeader("gradient", output_file)
-    gXY = methodGradient(XY, 0, newtonXY, output_file)
+    gXY = methodGradient(XY, variants[i], newtonXY, output_file)
     print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
     output_file.write("\n+-----+------------+------------+---------+--------------------+--------------------+-----+")
     print(f"x = {gXY[0]}, y = {gXY[1]};")
