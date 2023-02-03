@@ -73,6 +73,12 @@ def getFxy(XY, variant):
     if (variant == 0):
         fX[0] = math.sin(XY[0]) + 2 * XY[1] - 1.6
         fX[1] = math.cos(XY[1] - 1) + XY[0] - 1
+    elif (variant == 18):
+        fX[0] = 2 * XY[0] - math.cos(XY[1] + 1)
+        fX[1] = XY[1] + math.sin(XY[0]) + 0.4
+    elif (variant == 27):
+        fX[0] = math.cos(XY[1] + 0.5) - XY[0] - 0.8
+        fX[1] = math.sin(XY[0]) - 2 * XY[1] - 1.6
     else:
         print("Такого еще нет варианта")
 
@@ -89,6 +95,16 @@ def getDerivativeMatrix(variant, x, y):
         dF[0][1] = 1 #f2 over x
         dF[1][0] = 2 #f1 over y
         dF[1][1] = -math.sin(y - 1) #f2 over y
+    elif (variant == 18):
+        dF[0][0] = 2  # f1 over x
+        dF[0][1] = math.cos(XY[0])  # f2 over x
+        dF[1][0] = math.sin(XY[1] + 1)  # f1 over y
+        dF[1][1] = 1  # f2 over y
+    elif (variant == 27):
+        dF[0][0] = -1 # f1 over x
+        dF[0][1] = math.cos(XY[0]) # f2 over x
+        dF[1][0] = -math.sin(XY[1] + 0.5) # f1 over y
+        dF[1][1] = -2 # f2 over y
     else:
         print("Пока здесь такого варианта нету")
 
@@ -130,9 +146,25 @@ def printHeader(method_name):
         print("| Itr |      X     |      Y     |  Alpha  |    Норма невязки   |     Погрешность    |  k  |")
         print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
 
+def writeHeader(method_name, output_file):
+    if (method_name == "newton"):
+        output_file.write("\n")
+        output_file.write("\n+-NEWTON'S METHOD-----------------------------------------------------------------------------------+")
+        output_file.write("\n| Itr |      X      |      Y      |    Норма невязки    |          F1         |          F2         |")
+        output_file.write("\n+-----+-------------+-------------+---------------------+---------------------+---------------------+")
+
+    elif (method_name == "iteration"):
+        output_file.write("\n")
+        output_file.write("\n+-SIMPLE ITERATION METHOD-----------------------------------------------------------------------------------+")
+        pass
+    elif (method_name == "gradient"):
+        output_file.write("\n")
+        output_file.write("\n+-GRADIENT METHOD-------------------------------------------------------------------+-----+")
+        output_file.write("\n| Itr |      X     |      Y     |  Alpha  |    Норма невязки   |     Погрешность    |  k  |")
+        output_file.write("\n+-----+------------+------------+---------+--------------------+--------------------+-----+")
 
 #Newton's method
-def methodNewton(XY, variant):
+def methodNewton(XY, variant, output_file):
     epsilon = 1e-12
     iteration_counter = 0
     while (length(XY, variant) > epsilon):
@@ -162,7 +194,7 @@ def methodNewton(XY, variant):
         XY = [newXY[i] for i in range(len(dF))]
         #printinfo
         print("| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, XY[0], XY[1], length(XY, variant), getFxy(XY, variant)[0], getFxy(XY, variant)[1]))
-
+        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, XY[0], XY[1], length(XY, variant), getFxy(XY, variant)[0], getFxy(XY, variant)[1]))
     return XY
 
 
@@ -190,7 +222,7 @@ def getEucledianVectorNorm(vector):
 
 
 #метод Градиентного Спуска не работает - проблема в условии завершения
-def methodGradient(XY, variant, newtonXY):
+def methodGradient(XY, variant, newtonXY, output_file):
     epsilon = 1e-04
     timetostop = 1 + epsilon
     iteration_counter = 0
@@ -213,18 +245,42 @@ def methodGradient(XY, variant, newtonXY):
         timetostop = getEucledianVectorNorm(getFxy(XY, variant))
         #printinfo
         print("| {:3} | {:3.8f} | {:3.8f} | {:3.5f} | {:3.16f} | {:3.16f} | {:3} |".format(iteration_counter, XY[0], XY[1], alpha, timetostop, leng([XY[0] - newtonXY[0], XY[1] - newtonXY[1]]), k))
+        output_file.write("\n| {:3} | {:3.8f} | {:3.8f} | {:3.5f} | {:3.16f} | {:3.16f} | {:3} |".format(iteration_counter, XY[0], XY[1], alpha, timetostop, leng([XY[0] - newtonXY[0], XY[1] - newtonXY[1]]), k))
+
     return XY
 
 
 
 #MAIN
-XY = [0, 0.8] # [0][0] is XY and [0][1] is Y (примерные значения)
-printHeader("newton")
-newtonXY = methodNewton(XY, 0)
-print("+---------------------------------------------------------------------------------------------------+")
-print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
+variants = [0, 18, 27]
+output_filename = "lr3_output.txt"
+output_file = open(output_filename, "w")
+output_file.write("Запорожченко, Педаев. ЛР3.")
 
-printHeader("gradient")
-gXY = methodGradient(XY, 0, newtonXY)
-print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
-print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
+for i in range(len(variants)):
+    if (variants[i] == 0):
+        XY = [0, 0.8]
+    elif (variants[i] == 18):
+        XY = [0.5, -0.9]
+    elif (variants[i] == 27):
+        XY = [0.2, -0.7]
+    print(XY)
+    print("\n\n\nVARIANT {}".format(variants[i]))
+    output_file.write("\n\nVARIANT {}".format(variants[i]))
+    printHeader("newton")
+    writeHeader("newton", output_file)
+    newtonXY = methodNewton(XY, 0, output_file)
+    print("+---------------------------------------------------------------------------------------------------+")
+    print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
+    output_file.write("\n+---------------------------------------------------------------------------------------------------+")
+    output_file.write(f"\nx = {newtonXY[0]}, y = {newtonXY[1]};")
+
+    printHeader("gradient")
+    writeHeader("gradient", output_file)
+    gXY = methodGradient(XY, 0, newtonXY, output_file)
+    print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
+    output_file.write("\n+-----+------------+------------+---------+--------------------+--------------------+-----+")
+    print(f"x = {gXY[0]}, y = {gXY[1]};")
+    output_file.write(f"\nx = {gXY[0]}, y = {gXY[1]};")
+    #write to file
+
