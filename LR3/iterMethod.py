@@ -21,53 +21,16 @@ def devMatrix(x, y):
     ]
     return jak
 
+def F1(x, y):
+    return x-0.8+m.cos(y-1)
 
-def Iteratiobackupn(x, y):
-    round = 0
-    error = eps+1
+def F2(x, y):
+    return y-2-m.cos(x)
 
-    while(True):
-        round+=1
-
-        newX = 0.8-m.cos(y-1)
-        newY = 2+m.cos(x)
-
-        x = newX
-        y = newY
-
-        mJac = Jacobian(x, y)
-        norm = getEucledianNorm(mJac)
-        error = norm
-        print(round, x, y, norm)
 
 def lenght(x, y):
     return m.sqrt(x * x + y * y)
 
-def Iterationbacku0p(x, y):
-    round = 0
-
-    mJac = Jacobian(x, y)
-    norm = getEucledianNorm(mJac)
-
-    while(True):
-        round+=1
-
-        newX = 0.8-m.cos(y-1)
-        newY = 2+m.cos(x)
-
-        error = norm / (1 - norm) * lenght(newX - x, newY - y)
-
-        if (error < eps):
-            break
-
-        mJac = Jacobian(x, y)
-        norm = getEucledianNorm(mJac)
-
-        print(round, x, y, norm,)
-
-        x = newX
-        y = newY
-    return x,y
 
 def Iteration(x, y):
     round = 0
@@ -77,21 +40,21 @@ def Iteration(x, y):
     error = 1 + eps
     print(error)
 
-    while(error > eps):
+    while(lenght(F1(x, y), F2(x, y)) > eps):
         round+=1
 
         newX = 0.8-m.cos(y-1)
         newY = 2+m.cos(x)
 
-        error = norm / (1 - norm) * lenght(newX - x, newY - y)
-
         mJac = Jacobian(x, y)
         norm = getEucledianNorm(mJac)
 
-        print(round, x, y, norm,)
-
+        error = norm / (1 - norm) * lenght(newX - x, newY - y)
+        
         x = newX
         y = newY
+
+        print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
     return x,y
 if __name__ == "__main__":
     x0 = 0.900
