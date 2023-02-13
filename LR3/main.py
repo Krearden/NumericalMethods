@@ -138,8 +138,11 @@ def printHeader(method_name):
 
     elif (method_name == "iteration"):
         print("")
-        print("+-SIMPLE ITERATION METHOD-----------------------------------------------------------------------------------+")
-        pass
+        print("+-SIMPLE ITERATION METHOD---------------------------------------------------------+")
+        print("| Itr |      X      |      Y      | Норма невязки |       F1      |       F2      |")
+        print("+-----+-------------+-------------+---------------+---------------+---------------+")
+
+
     elif (method_name == "gradient"):
         print("")
         print("+-GRADIENT METHOD-------------------------------------------------------------------+-----+")
@@ -155,7 +158,9 @@ def writeHeader(method_name, output_file):
 
     elif (method_name == "iteration"):
         output_file.write("\n")
-        output_file.write("\n+-SIMPLE ITERATION METHOD-----------------------------------------------------------------------------------+")
+        output_file.write("\n+-SIMPLE ITERATION METHOD---------------------------------------------------------+")
+        output_file.write("\n| Itr |      X      |      Y      | Норма невязки |       F1      |       F2      |")
+        output_file.write("\n+-----+-------------+-------------+---------------+---------------+---------------+")
         pass
     elif (method_name == "gradient"):
         output_file.write("\n")
@@ -249,38 +254,100 @@ def methodGradient(XY, variant, newtonXY, output_file):
 
     return XY
 
+def Jacobian(x, y):
+    jak = [
+    [0.0, math.sin(y-1)],
+    [-math.sin(x),  0.0 ]
+    ]
+    return jak
+
+def devMatrix(x, y):
+    jak = [
+    [1.0, -1*math.sin(y-1)],
+    [math.sin(x),  1.0 ]
+    ]
+    return jak
+
+def F1(x, y):
+    return x-0.8+math.cos(y-1)
+
+def F2(x, y):
+    return y-2-math.cos(x)
+
+
+def lenght(x, y):
+    return math.sqrt(x * x + y * y)
+
+
+def Iteration(x, y):
+    round = 0
+    eps = 1e-4
+
+    mJac = Jacobian(x, y)
+    norm = getEucledianNorm(mJac)
+    error = 1 + eps
+
+
+    while(lenght(F1(x, y), F2(x, y)) > eps):
+        round+=1
+
+        newX = 0.8-math.cos(y-1)
+        newY = 2+math.cos(x)
+
+        mJac = Jacobian(x, y)
+        norm = getEucledianNorm(mJac)
+
+        error = norm / (1 - norm) * lenght(newX - x, newY - y)
+        
+        x = newX
+        y = newY
+
+        #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
+        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, norm, F1(x, y), F2(x, y)))
+        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, norm, F1(x, y), F2(x, y)))
+    return x,y
 
 
 #MAIN
-variants = [0, 18, 27]
-output_filename = "lr3_output.txt"
-output_file = open(output_filename, "w")
-output_file.write("Запорожченко, Педаев. ЛР3.")
+if __name__ == "__main__":
+    variants = [0, 18, 27]
+    output_filename = "lr3_output.txt"
+    output_file = open(output_filename, "w")
+    output_file.write("Запорожченко, Педаев. ЛР3.")
 
-for i in range(len(variants)):
-    if (variants[i] == 0):
-        XY = [0, 0.8]
-    elif (variants[i] == 18):
-        XY = [0.5, -0.9]
-    elif (variants[i] == 27):
-        XY = [0.2, -0.7]
+    for i in range(len(variants)):
+        if (variants[i] == 0):
+            XY = [0, 0.8]
+        elif (variants[i] == 18):
+            XY = [0.5, -0.9]
+        elif (variants[i] == 27):
+            XY = [0.2, -0.7]
 
-    print("\n\n\nVARIANT {}, {}".format(variants[i], XY))
-    output_file.write("\n\nVARIANT {}".format(variants[i]))
-    printHeader("newton")
-    writeHeader("newton", output_file)
-    newtonXY = methodNewton(XY, variants[i], output_file)
-    print("+---------------------------------------------------------------------------------------------------+")
-    print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
-    output_file.write("\n+---------------------------------------------------------------------------------------------------+")
-    output_file.write(f"\nx = {newtonXY[0]}, y = {newtonXY[1]};")
+        print("\n\n\nVARIANT {}, {}".format(variants[i], XY))
+        output_file.write("\n\nVARIANT {}".format(variants[i]))
 
-    printHeader("gradient")
-    writeHeader("gradient", output_file)
-    gXY = methodGradient(XY, variants[i], newtonXY, output_file)
-    print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
-    output_file.write("\n+-----+------------+------------+---------+--------------------+--------------------+-----+")
-    print(f"x = {gXY[0]}, y = {gXY[1]};")
-    output_file.write(f"\nx = {gXY[0]}, y = {gXY[1]};")
-    #write to file
+        printHeader("iteration")
+        writeHeader("iteration", output_file)
+        itX, itY = Iteration(XY[0], XY[1])
+        print("+---------------------------------------------------------------------------------+")
+        print(f"x = {itX}, y = {itY};")
+        output_file.write("\n+---------------------------------------------------------------------------------+")
+        output_file.write(f"\nx = {itX}, y = {itY};")
+
+        printHeader("newton")
+        writeHeader("newton", output_file)
+        newtonXY = methodNewton(XY, variants[i], output_file)
+        print("+---------------------------------------------------------------------------------------------------+")
+        print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
+        output_file.write("\n+---------------------------------------------------------------------------------------------------+")
+        output_file.write(f"\nx = {newtonXY[0]}, y = {newtonXY[1]};")
+
+        printHeader("gradient")
+        writeHeader("gradient", output_file)
+        gXY = methodGradient(XY, variants[i], newtonXY, output_file)
+        print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
+        output_file.write("\n+-----+------------+------------+---------+--------------------+--------------------+-----+")
+        print(f"x = {gXY[0]}, y = {gXY[1]};")
+        output_file.write(f"\nx = {gXY[0]}, y = {gXY[1]};")
+        #write to file
 
