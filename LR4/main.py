@@ -19,6 +19,14 @@ def getFx(x, variant):
 def getH(a, b, n):
     return (b - a) / (n - 1)
 
+def Factorial(n):
+    if (n == 0):
+        return 1
+    else:
+        return n * Factorial(n - 1)
+
+
+#Таблица разделенных разностей
 def createSplitDiffTable(variant, a, b, n):
     h = getH(a, b, n)
     xs = []
@@ -35,6 +43,7 @@ def createSplitDiffTable(variant, a, b, n):
 
     return xs, differences_table
 
+#Печать таблицы разделенных разностей
 def printSplitDiffTable(xs, differences_table):
     print("Таблица разделенных разностей:")
     for i in range(len(xs)):
@@ -43,22 +52,48 @@ def printSplitDiffTable(xs, differences_table):
             print(differences_table[j][i], end = ' ')
         print()
 
+#Полином ньютона по таблице разделенных разностей
 def getNewtonPolynom(x, xs, differences_table):
     n = len(xs)
     y = 0
-    part_summ = 0
+    part_summ = 1
     for i in range(n):
         y += part_summ * differences_table[i][0]
         part_summ *= x - xs[i]
     return y
 
+#Фукнция. Возвращает произведения разностей (x - xi): i = 0 ... n - 1; xi берется из таблицы разделенных разностей.
+def getOmega(x, xs, n):
+    result = 1
+    for i in range(n):
+        result *= x - xs[i]
+    return abs(result)
+
+def getFirstDerivative(variant, x):
+    if (variant == 0):
+        return log(3) * pow(3, x) + 9 * x * x
+    else:
+        print("Not implemented yet")
+
+def getMaxDerivatire(variant, x):
+    maximum_derivative = 1e-100
+    for x in xs:
+        first_derivative = getFirstDerivative(variant, x)
+        if (first_derivative > maximum_derivative):
+            maximum_derivative = first_derivative
+    return maximum_derivative
+
+def getNewtonError(variant, x, xs, n):
+    return getMaxDerivatire(variant, xs) * getOmega(x, xs, n)/ Factorial(n)
+
 def printNewtonInterpolation(a, b, n, xs, differences_table):
     h = getH(a, b, n)
     a += h / 2
+    print(" x              f(x)              Pn(x)                  Delta                    Оценка (вот здесь ошибка)")
     while (a < b):
         Fx = getFx(a, variant)
-        newtonFx = getNewtonPolynom(a, xs, differences_table)
-        print("{:2.3f}, {}, {}".format(a, Fx, newtonFx))
+        newtonPx = getNewtonPolynom(a, xs, differences_table)
+        print("{:2.3f}, {}, {}, {}, {}".format(a, Fx, newtonPx, abs(newtonPx - Fx), getNewtonError(variant, a, xs, n)))
         a += h / 2
 
 
