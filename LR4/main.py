@@ -69,32 +69,39 @@ def getOmega(x, xs, n):
         result *= x - xs[i]
     return abs(result)
 
-def getFirstDerivative(variant, x):
+#Фукнция - возвращает производную функции n-ного порядка
+def Derivative(variant, x, n):
     if (variant == 0):
-        return log(3) * pow(3, x) + 9 * x * x
+        if (n >= 4):
+            return pow(3, x) * pow(log(3), n)
+        else:
+            return
+            # return log(3) * pow(3, x) + 9 * x * x
     else:
         print("Not implemented yet")
 
-def getMaxDerivatire(variant, x):
+def getMaxDerivatire(variant, xs, n):
     maximum_derivative = 1e-100
     for x in xs:
-        first_derivative = getFirstDerivative(variant, x)
+        first_derivative = abs(Derivative(variant, x, n))
         if (first_derivative > maximum_derivative):
             maximum_derivative = first_derivative
     return maximum_derivative
 
 def getNewtonError(variant, x, xs, n):
-    return getMaxDerivatire(variant, xs) * getOmega(x, xs, n)/ Factorial(n)
+    return getMaxDerivatire(variant, xs, n) * getOmega(x, xs, n)/ Factorial(n)
 
+#(вот здесь ошибка)
 def printNewtonInterpolation(a, b, n, xs, differences_table):
+    print("Интерполяционная формула Ньютона")
     h = getH(a, b, n)
-    a += h / 2
-    print(" x              f(x)              Pn(x)                  Delta                    Оценка (вот здесь ошибка)")
-    while (a < b):
-        Fx = getFx(a, variant)
-        newtonPx = getNewtonPolynom(a, xs, differences_table)
-        print("{:2.3f}, {}, {}, {}, {}".format(a, Fx, newtonPx, abs(newtonPx - Fx), getNewtonError(variant, a, xs, n)))
-        a += h / 2
+    x = a + h / 2
+    print(" x              f(x)              Pn(x)                  Delta                    Оценка ")
+    while (x <= b):
+        Fx = getFx(x, variant)
+        newtonPx = getNewtonPolynom(x, xs, differences_table)
+        print("{:2.3f}, {}, {}, {}, {}".format(x, Fx, newtonPx, abs(newtonPx - Fx), getNewtonError(variant, x, xs, n)))
+        x += h
 
 
 #MAIN
@@ -104,9 +111,7 @@ if __name__ == '__main__':
         a = 1
         b = 2
         n = 6
-        xs, difft = createSplitDiffTable(variant, a, b, n)
-        printSplitDiffTable(xs, difft)
+        xs, differences_table = createSplitDiffTable(variant, a, b, n)
+        printSplitDiffTable(xs, differences_table)
         print()
-        printNewtonInterpolation(a, b, n, xs, difft)
-        # for i in range(len(xs)):
-        #     print(xs[i], difft[i])
+        printNewtonInterpolation(a, b, n, xs, differences_table)
