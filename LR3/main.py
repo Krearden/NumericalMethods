@@ -138,9 +138,9 @@ def printHeader(method_name):
 
     elif (method_name == "iteration"):
         print("")
-        print("+-SIMPLE ITERATION METHOD---------------------------------------------------------+")
-        print("| Itr |      X      |      Y      | Норма невязки |       F1      |       F2      |")
-        print("+-----+-------------+-------------+---------------+---------------+---------------+")
+        print("+-SIMPLE ITERATION METHOD-----------------------------------------------------------------------+")
+        print("| Itr |      X      |      Y      | Норма невязки | Погрешность |       F1      |       F2      |")
+        print("+-----+-------------+-------------+---------------+-------------+---------------+---------------+")
 
 
     elif (method_name == "gradient"):
@@ -263,13 +263,16 @@ def Jacobian(x, y):
 
 
 
-def Iteration(x, y, variant):
+def Iteration(x, y, newtonXY, variant):
     round = 0
     eps = 1e-4
 
     mJac = Jacobian(x, y)
     norm = getEucledianNorm(mJac)
     error = 1 + eps
+
+    defX = x
+    defY = y
 
 
     while(length([x, y], variant) > eps):
@@ -288,15 +291,15 @@ def Iteration(x, y, variant):
         mJac = Jacobian(x, y)
         norm = getEucledianNorm(mJac)
 
-        error = norm / (1 - norm) * lenght(newX - x, newY - y)
+        #error = norm / (1 - norm) * lenght(newX - x, newY - y)
         
         x = newX
         y = newY
         Fxy = getFxy([x, y], variant)
 
         #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), Fxy[0], Fxy[1]))
-        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(Fxy[0], Fxy[1]), Fxy[0], Fxy[1]))
+        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), Fxy[0], Fxy[1]))
+        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), Fxy[0], Fxy[1]))
     return x,y
 
 
@@ -318,14 +321,6 @@ if __name__ == "__main__":
         print("\n\n\nVARIANT {}, {}".format(variants[i], XY))
         output_file.write("\n\nVARIANT {}".format(variants[i]))
 
-        printHeader("iteration")
-        writeHeader("iteration", output_file)
-        itX, itY = Iteration(XY[0], XY[1], variants[i])
-        print("+---------------------------------------------------------------------------------+")
-        print(f"x = {itX}, y = {itY};")
-        output_file.write("\n+---------------------------------------------------------------------------------+")
-        output_file.write(f"\nx = {itX}, y = {itY};")
-
         printHeader("newton")
         writeHeader("newton", output_file)
         newtonXY = methodNewton(XY, variants[i], output_file)
@@ -333,6 +328,14 @@ if __name__ == "__main__":
         print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
         output_file.write("\n+---------------------------------------------------------------------------------------------------+")
         output_file.write(f"\nx = {newtonXY[0]}, y = {newtonXY[1]};")
+
+        printHeader("iteration")
+        writeHeader("iteration", output_file)
+        itX, itY = Iteration(XY[0], XY[1], newtonXY, variants[i])
+        print("+---------------------------------------------------------------------------------+")
+        print(f"x = {itX}, y = {itY};")
+        output_file.write("\n+---------------------------------------------------------------------------------+")
+        output_file.write(f"\nx = {itX}, y = {itY};")
 
         printHeader("gradient")
         writeHeader("gradient", output_file)
