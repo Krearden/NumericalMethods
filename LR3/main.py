@@ -262,9 +262,6 @@ def Jacobian(x, y):
     return jak
 
 
-def lenght(x, y):
-    return math.sqrt(x * x + y * y)
-
 
 def Iteration(x, y, variant):
     round = 0
@@ -274,10 +271,8 @@ def Iteration(x, y, variant):
     norm = getEucledianNorm(mJac)
     error = 1 + eps
 
-    Fxy = getFxy([x, y], variant)
 
-
-    while(lenght(Fxy[0], Fxy[1]) > eps):
+    while(length([x, y], variant) > eps):
         round+=1
 
         if (variant == 0):
@@ -300,14 +295,14 @@ def Iteration(x, y, variant):
         Fxy = getFxy([x, y], variant)
 
         #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(Fxy[0], Fxy[1]), Fxy[0], Fxy[1]))
+        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), Fxy[0], Fxy[1]))
         output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(Fxy[0], Fxy[1]), Fxy[0], Fxy[1]))
     return x,y
 
 
 #MAIN
 if __name__ == "__main__":
-    variants = [27] #, 18, 27]
+    variants = [18, 27] #, 18, 27]
     output_filename = "lr3_output.txt"
     output_file = open(output_filename, "w")
     output_file.write("Запорожченко, Педаев. ЛР3.")
