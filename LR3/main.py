@@ -261,25 +261,18 @@ def Jacobian(x, y):
     ]
     return jak
 
-def devMatrix(x, y):
-    jak = [
-    [1.0, -1*math.sin(y-1)],
-    [math.sin(x),  1.0 ]
-    ]
-    return jak
-
 def F1(x, y):
-    return x-0.8+math.cos(y-1)
+    return math.sin(x) + 2*y - 1.6
 
 def F2(x, y):
-    return y-2-math.cos(x)
+    return math.cos(y-1) + x -1
 
 
 def lenght(x, y):
     return math.sqrt(x * x + y * y)
 
 
-def Iteration(x, y):
+def Iteration(x, y, variant):
     round = 0
     eps = 1e-4
 
@@ -291,8 +284,9 @@ def Iteration(x, y):
     while(lenght(F1(x, y), F2(x, y)) > eps):
         round+=1
 
-        newX = 0.8-math.cos(y-1)
-        newY = 2+math.cos(x)
+        if (variant == 0):
+            newX = 1-math.cos(y-1)
+            newY = 0.8-math.sin(x)/2
 
         mJac = Jacobian(x, y)
         norm = getEucledianNorm(mJac)
@@ -303,14 +297,14 @@ def Iteration(x, y):
         y = newY
 
         #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, norm, F1(x, y), F2(x, y)))
+        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(F1(x, y), F2(x, y)), F1(x, y), F2(x, y)))
         output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, norm, F1(x, y), F2(x, y)))
     return x,y
 
 
 #MAIN
 if __name__ == "__main__":
-    variants = [0, 18, 27]
+    variants = [0] #, 18, 27]
     output_filename = "lr3_output.txt"
     output_file = open(output_filename, "w")
     output_file.write("Запорожченко, Педаев. ЛР3.")
@@ -328,7 +322,7 @@ if __name__ == "__main__":
 
         printHeader("iteration")
         writeHeader("iteration", output_file)
-        itX, itY = Iteration(XY[0], XY[1])
+        itX, itY = Iteration(XY[0], XY[1], variants[i])
         print("+---------------------------------------------------------------------------------+")
         print(f"x = {itX}, y = {itY};")
         output_file.write("\n+---------------------------------------------------------------------------------+")
