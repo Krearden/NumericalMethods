@@ -261,12 +261,6 @@ def Jacobian(x, y):
     ]
     return jak
 
-def F1(x, y):
-    return math.sin(x) + 2*y - 1.6
-
-def F2(x, y):
-    return math.cos(y-1) + x -1
-
 
 def lenght(x, y):
     return math.sqrt(x * x + y * y)
@@ -289,6 +283,12 @@ def Iteration(x, y, variant):
         if (variant == 0):
             newX = 1-math.cos(y-1)
             newY = 0.8-math.sin(x)/2
+        elif (variant == 18):
+            newX = math.cos(y+1)/2
+            newY = -math.sin(x) - 0.4
+        elif (variant == 27):
+            newX = -0.8 + math.cos(y + 0.5)
+            newY = (math.sin(x) - 1.6)/2
 
         mJac = Jacobian(x, y)
         norm = getEucledianNorm(mJac)
@@ -307,7 +307,7 @@ def Iteration(x, y, variant):
 
 #MAIN
 if __name__ == "__main__":
-    variants = [0] #, 18, 27]
+    variants = [27] #, 18, 27]
     output_filename = "lr3_output.txt"
     output_file = open(output_filename, "w")
     output_file.write("Запорожченко, Педаев. ЛР3.")
