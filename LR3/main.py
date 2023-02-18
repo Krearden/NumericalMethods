@@ -280,8 +280,10 @@ def Iteration(x, y, variant):
     norm = getEucledianNorm(mJac)
     error = 1 + eps
 
+    Fxy = getFxy([x, y], variant)
 
-    while(lenght(F1(x, y), F2(x, y)) > eps):
+
+    while(lenght(Fxy[0], Fxy[1]) > eps):
         round+=1
 
         if (variant == 0):
@@ -295,10 +297,11 @@ def Iteration(x, y, variant):
         
         x = newX
         y = newY
+        Fxy = getFxy([x, y], variant)
 
         #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(F1(x, y), F2(x, y)), F1(x, y), F2(x, y)))
-        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, norm, F1(x, y), F2(x, y)))
+        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(Fxy[0], Fxy[1]), Fxy[0], Fxy[1]))
+        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, lenght(Fxy[0], Fxy[1]), Fxy[0], Fxy[1]))
     return x,y
 
 
