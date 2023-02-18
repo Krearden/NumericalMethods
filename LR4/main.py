@@ -9,6 +9,22 @@ from math import *
 
 #FUNCTIONS
 
+#print matrix on the screen
+def printMatrix(matrix, accuracy = False):
+    if matrix:
+        for row in matrix:
+            for element in row:
+                if accuracy:
+                    if (element == 0):
+                        print("{:10.14f}  ".format(element), end="")
+                    else:
+                        print("{:.14}  ".format(element), end="")
+                else:
+                    print("{:10.6f} ".format(element), end="")
+            print()
+    else:
+        print("Empty matrix given")
+
 #значение функции в точке x
 def getFx(x, variant):
     if (variant == 0):
@@ -91,18 +107,36 @@ def getMaxDerivatire(variant, xs, n):
 def getNewtonError(variant, x, xs, n):
     return getMaxDerivatire(variant, xs, n) * getOmega(x, xs, n)/ Factorial(n)
 
-#(вот здесь ошибка)
+
 def printNewtonInterpolation(a, b, n, xs, differences_table):
     print("Интерполяционная формула Ньютона")
     h = getH(a, b, n)
     x = a + h / 2
-    print(" x              f(x)              Pn(x)                  Delta                    Оценка ")
+    print(" x              f(x)              Pn(x)             Delta             Оценка погрешности ")
     while (x <= b):
         Fx = getFx(x, variant)
         newtonPx = getNewtonPolynom(x, xs, differences_table)
         print("{:2.3f}, {}, {}, {}, {}".format(x, Fx, newtonPx, abs(newtonPx - Fx), getNewtonError(variant, x, xs, n)))
         x += h
 
+
+
+#Вычисление трехдиагональной матрицы (h = const for all xs's)
+def getThreeDiagonalMatrix(a, b, n):
+    h = getH(a, b, n)
+    matrix = [[0] * (n - 2) for i in range(n - 2)]
+    for i in range(n - 2):
+        matrix[i][i] = 2 * (h + h)
+        if (i < n / 2):
+            matrix[i + 1][i] = h
+            matrix[i][i + 1] = h
+    return matrix
+
+
+def printCubicInterpolation(a, b, n):
+    print("Интерполяция кубическим сплайном деф. 1")
+    matrix  = getThreeDiagonalMatrix(a, b, n)
+    printMatrix(matrix)
 
 #MAIN
 if __name__ == '__main__':
@@ -115,3 +149,6 @@ if __name__ == '__main__':
         printSplitDiffTable(xs, differences_table)
         print()
         printNewtonInterpolation(a, b, n, xs, differences_table)
+
+        print()
+        printCubicInterpolation(a, b, n)
