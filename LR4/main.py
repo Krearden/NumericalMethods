@@ -1,5 +1,6 @@
 #coding=utf-8
 from math import *
+from LU import *
 
 
 # Лабораторная работа № 4 на тему «Интерполирование. Среднеквадратичное приближение. Равномерное приближение»
@@ -32,15 +33,16 @@ def getFx(x, variant):
     else:
         print("Not done yet")
 
+#Расстояние h между точками интерполяции по трем параметрам
 def getH(a, b, n):
     return (b - a) / (n - 1)
 
+#Факториал числа
 def Factorial(n):
     if (n == 0):
         return 1
     else:
         return n * Factorial(n - 1)
-
 
 #Таблица разделенных разностей
 def createSplitDiffTable(variant, a, b, n):
@@ -86,10 +88,12 @@ def getOmega(x, xs, n):
     return abs(result)
 
 #Фукнция - возвращает производную функции n-ного порядка
-def Derivative(variant, x, n):
+def Derivative(variant, x, n = 1):
     if (variant == 0):
         if (n >= 4):
             return pow(3, x) * pow(log(3), n)
+        elif (n == 1):
+            return log(3) * pow(3, x) + 9 * x * x
         else:
             return
             # return log(3) * pow(3, x) + 9 * x * x
@@ -121,6 +125,15 @@ def printNewtonInterpolation(a, b, n, xs, differences_table):
 
 
 
+#solve SLAU
+def solve_SLAU(matrix, b):
+    A, L, U, p = LU(matrix)
+    # find x
+    b = multipMatrixByVector(getPmatrix(p), b)
+    y = forwardSubstitution(L, b)
+    x = backwardSubstitution(U, y)
+    return x
+
 #Вычисление трехдиагональной матрицы (h = const for all xs's)
 def getThreeDiagonalMatrix(a, b, n):
     h = getH(a, b, n)
@@ -133,10 +146,34 @@ def getThreeDiagonalMatrix(a, b, n):
     return matrix
 
 
-def printCubicInterpolation(a, b, n):
+def printCubicInterpolation(a, b, n, variant):
     print("Интерполяция кубическим сплайном деф. 1")
-    matrix  = getThreeDiagonalMatrix(a, b, n)
-    printMatrix(matrix)
+    #задаем трехдиагональную матрицу для выбранных точек и расстояния между ними
+    # matrix  = getThreeDiagonalMatrix(a, b, n)
+    matrix = [[4, 1, 0, 0],[1, 4, 1, 0],[0, 1, 4, 1],[0, 0, 1, 4]]
+    #задаем вектор 1-х пр-х
+    m = [0 for i in range(n)]
+    m[0] = Derivative(variant, a)
+    m[5] = Derivative(variant, b)
+    #задаем вектор правых частей
+    h = getH(a, b, n)
+    b = [0 for i in range(n - 2)]
+    for i in range(n - 2):
+        b[i] = 3 * ( getFx(xs[i + 2], variant) - getFx(xs[i], variant) ) / h
+    #выполняем корректировку крайних элементов
+    b[0] -= m[0]
+    b[3] -= m[5]
+    #решение СЛАУ
+    mm = solve_SLAU(matrix, b)
+    for i in range(1, n - 1):
+        m[i] = mm[i - 1]
+    #print
+    print()
+    print("m: ")
+    print(m)
+
+
+
 
 #MAIN
 if __name__ == '__main__':
@@ -151,4 +188,4 @@ if __name__ == '__main__':
         printNewtonInterpolation(a, b, n, xs, differences_table)
 
         print()
-        printCubicInterpolation(a, b, n)
+        printCubicInterpolation(a, b, n, variant)
