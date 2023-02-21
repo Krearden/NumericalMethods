@@ -65,8 +65,25 @@ def getEucledianNorm(A):
 
 
 #Jacobi marix
-def getJacobian():
-    pass
+def getJacobian(x, y, variant):
+    if (variant == 0):
+        jak = [
+        [0.0, math.sin(y-1)],
+        [-math.cos(x)/2,  0.0 ]
+        ]
+    elif (variant == 18):
+        jak = [
+        [0.0, -1*math.sin(y+1)],
+        [-1*math.cos(x), 0.0 ]
+        ]
+    elif (variant == 27):
+        jak = [
+        [0.0, -1*math.sin(y+0.5)],
+        [math.cos(x)/2,  0.0 ]
+        ]
+    else:
+        jak == [[0, 0], [0, 0]]
+    return jak
 
 def getFxy(XY, variant):
     fX = [0 for i in range(len(XY))]
@@ -138,16 +155,16 @@ def printHeader(method_name):
 
     elif (method_name == "iteration"):
         print("")
-        print("+-SIMPLE ITERATION METHOD-----------------------------------------------------------------------+")
-        print("| Itr |      X      |      Y      | Норма невязки | Погрешность |       F1      |       F2      |")
-        print("+-----+-------------+-------------+---------------+-------------+---------------+---------------+")
+        print("+-SIMPLE ITERATION METHOD----------------------------------------------------------+")
+        print("| Itr |      X      |      Y      | Норма невязки | Погрешность |  Норма якобиана  |")
+        print("+-----+-------------+-------------+---------------+-------------+------------------+")
 
 
     elif (method_name == "gradient"):
         print("")
-        print("+-GRADIENT METHOD-------------------------------------------------------------------+-----+")
-        print("| Itr |      X     |      Y     |  Alpha  |    Норма невязки   |     Погрешность    |  k  |")
-        print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
+        print("+-GRADIENT METHOD---+-------------+---------+--------------------+--------------------+-----+")
+        print("| Itr |      X      |      Y      |  Alpha  |    Норма невязки   |     Погрешность    |  k  |")
+        print("+-----+-------------+-------------+---------+--------------------+--------------------+-----+")
 
 def writeHeader(method_name, output_file):
     if (method_name == "newton"):
@@ -198,7 +215,7 @@ def methodNewton(XY, variant, output_file):
         #copy
         XY = [newXY[i] for i in range(len(dF))]
         #printinfo
-        print("| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, XY[0], XY[1], length(XY, variant), getFxy(XY, variant)[0], getFxy(XY, variant)[1]))
+        print("| {:3} |  {:3.8f} | {: 3.8f} |          {:1.8f} |         {: 3.8f} |         {: 3.8f} |".format(iteration_counter, XY[0], XY[1], length(XY, variant), getFxy(XY, variant)[0], getFxy(XY, variant)[1]))
         output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |          {:1.8f} |         {:3.8f} |         {:3.8f} |".format(iteration_counter, XY[0], XY[1], length(XY, variant), getFxy(XY, variant)[0], getFxy(XY, variant)[1]))
     return XY
 
@@ -249,25 +266,16 @@ def methodGradient(XY, variant, newtonXY, output_file):
         XY = [newXY[i] for i in range(len(XY))]
         timetostop = getEucledianVectorNorm(getFxy(XY, variant))
         #printinfo
-        print("| {:3} | {:3.8f} | {:3.8f} | {:3.5f} | {:3.16f} | {:3.16f} | {:3} |".format(iteration_counter, XY[0], XY[1], alpha, timetostop, leng([XY[0] - newtonXY[0], XY[1] - newtonXY[1]]), k))
+        print("| {:3} | {: 3.8f} | {:3.8f} | {:3.5f} | {:3.16f} | {:3.16f} | {:3} |".format(iteration_counter, XY[0], XY[1], alpha, timetostop, leng([XY[0] - newtonXY[0], XY[1] - newtonXY[1]]), k))
         output_file.write("\n| {:3} | {:3.8f} | {:3.8f} | {:3.5f} | {:3.16f} | {:3.16f} | {:3} |".format(iteration_counter, XY[0], XY[1], alpha, timetostop, leng([XY[0] - newtonXY[0], XY[1] - newtonXY[1]]), k))
 
     return XY
-
-def Jacobian(x, y):
-    jak = [
-    [0.0, math.sin(y-1)],
-    [-math.sin(x),  0.0 ]
-    ]
-    return jak
-
-
 
 def Iteration(x, y, newtonXY, variant):
     round = 0
     eps = 1e-4
 
-    mJac = Jacobian(x, y)
+    mJac = getJacobian(x, y, variant)
     norm = getEucledianNorm(mJac)
     error = 1 + eps
 
@@ -288,7 +296,7 @@ def Iteration(x, y, newtonXY, variant):
             newX = -0.8 + math.cos(y + 0.5)
             newY = (math.sin(x) - 1.6)/2
 
-        mJac = Jacobian(x, y)
+        mJac = getJacobian(x, y, variant)
         norm = getEucledianNorm(mJac)
 
         #error = norm / (1 - norm) * lenght(newX - x, newY - y)
@@ -298,7 +306,7 @@ def Iteration(x, y, newtonXY, variant):
         Fxy = getFxy([x, y], variant)
 
         #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), Fxy[0], Fxy[1]))
+        print("| {:3} | {: 3.8f} | {: 3.8f} |    {:1.8f} |  {:1.8f} |      {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), norm))
         output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), Fxy[0], Fxy[1]))
     return x,y
 
@@ -324,7 +332,7 @@ if __name__ == "__main__":
         printHeader("newton")
         writeHeader("newton", output_file)
         newtonXY = methodNewton(XY, variants[i], output_file)
-        print("+---------------------------------------------------------------------------------------------------+")
+        print("+-----+-------------+-------------+-----------------------------------------------------------------+")
         print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
         output_file.write("\n+---------------------------------------------------------------------------------------------------+")
         output_file.write(f"\nx = {newtonXY[0]}, y = {newtonXY[1]};")
@@ -332,7 +340,7 @@ if __name__ == "__main__":
         printHeader("iteration")
         writeHeader("iteration", output_file)
         itX, itY = Iteration(XY[0], XY[1], newtonXY, variants[i])
-        print("+---------------------------------------------------------------------------------+")
+        print("+----------------------------------------------------------------------------------+")
         print(f"x = {itX}, y = {itY};")
         output_file.write("\n+---------------------------------------------------------------------------------+")
         output_file.write(f"\nx = {itX}, y = {itY};")
@@ -340,7 +348,7 @@ if __name__ == "__main__":
         printHeader("gradient")
         writeHeader("gradient", output_file)
         gXY = methodGradient(XY, variants[i], newtonXY, output_file)
-        print("+-----+------------+------------+---------+--------------------+--------------------+-----+")
+        print("+-----+-------------+-------------+---------+--------------------+--------------------+-----+")
         output_file.write("\n+-----+------------+------------+---------+--------------------+--------------------+-----+")
         print(f"x = {gXY[0]}, y = {gXY[1]};")
         output_file.write(f"\nx = {gXY[0]}, y = {gXY[1]};")
