@@ -66,12 +66,7 @@ def getEucledianNorm(A):
 
 #Jacobi marix
 def getJacobian(x, y, variant):
-    if (variant == 0):
-        jak = [
-        [0.0, math.sin(y-1)],
-        [-math.sin(x),  0.0 ]
-        ]
-    elif (variant == 18):
+    if (variant == 18):
         jak = [
         [0.0, -1*math.sin(y+1)],
         [-1*math.cos(x), 0.0 ]
@@ -87,10 +82,7 @@ def getJacobian(x, y, variant):
 
 def getFxy(XY, variant):
     fX = [0 for i in range(len(XY))]
-    if (variant == 0):
-        fX[0] = math.sin(XY[0] + 2) - XY[1] - 1.5
-        fX[1] = math.cos(XY[1] - 2) + XY[0] - 0.5
-    elif (variant == 18):
+    if (variant == 18):
         fX[0] = 2 * XY[0] - math.cos(XY[1] + 1)
         fX[1] = XY[1] + math.sin(XY[0]) + 0.4
     elif (variant == 27):
@@ -106,13 +98,7 @@ def getFxy(XY, variant):
 def getDerivativeMatrix(variant, x, y):
     N = 2
     dF = [[0 for i in range(N)] for i in range(N)]
-    #test variant
-    if (variant == 0):
-        dF[0][0] = 1 #f1 over x
-        dF[0][1] = -math.sin(y-1) #f2 over x
-        dF[1][0] = math.sin(x) #f1 over y
-        dF[1][1] = 1 #f2 over y
-    elif (variant == 18):
+    if (variant == 18):
         dF[0][0] = 2  # f1 over x
         dF[0][1] = math.cos(XY[0])  # f2 over x
         dF[1][0] = math.sin(XY[1] + 1)  # f1 over y
@@ -155,9 +141,9 @@ def printHeader(method_name):
 
     elif (method_name == "iteration"):
         print("")
-        print("+-SIMPLE ITERATION METHOD----------------------------------------------------------+")
-        print("| Itr |      X      |      Y      | Норма невязки | Погрешность |  Норма якобиана  |")
-        print("+-----+-------------+-------------+---------------+-------------+------------------+")
+        print("+-SIMPLE ITERATION METHOD-------------------------------------------------------------------------------+")
+        print("| Itr |      X      |      Y      | Норма невязки | Погрешность | Оценка погрешности |  Норма якобиана  |")
+        print("+-----+-------------+-------------+---------------+-------------+--------------------+------------------+")
 
 
     elif (method_name == "gradient"):
@@ -175,9 +161,9 @@ def writeHeader(method_name, output_file):
 
     elif (method_name == "iteration"):
         output_file.write("\n")
-        output_file.write("\n+-SIMPLE ITERATION METHOD---------------------------------------------------------+")
-        output_file.write("\n| Itr |      X      |      Y      | Норма невязки |       F1      |       F2      |")
-        output_file.write("\n+-----+-------------+-------------+---------------+---------------+---------------+")
+        output_file.write("\n+-SIMPLE ITERATION METHOD-------------------------------------------------------------------------------+")
+        output_file.write("\n| Itr |      X      |      Y      | Норма невязки | Погрешность | Оценка погрешности |  Норма якобиана  |")
+        output_file.write("\n+-----+-------------+-------------+---------------+-------------+--------------------+------------------+")
         pass
     elif (method_name == "gradient"):
         output_file.write("\n")
@@ -278,10 +264,7 @@ def Iteration(x, y, newtonXY, variant):
     while(length([x, y], variant) > eps):
         round+=1
 
-        if (variant == 0):
-            newX = 0.8-math.cos(y-1)
-            newY = 2+math.cos(x)
-        elif (variant == 18):
+        if (variant == 18):
             newX = math.cos(y+1)/2
             newY = -math.sin(x) - 0.4
         elif (variant == 27):
@@ -292,29 +275,25 @@ def Iteration(x, y, newtonXY, variant):
         normJac = getEucledianNorm(mJac)
         errorRate = normJac / (1 - normJac) * leng([x - newtonXY[0], y - newtonXY[1]])
 
-        #error = norm / (1 - norm) * lenght(newX - x, newY - y)
         
         x = newX
         y = newY
         Fxy = getFxy([x, y], variant)
 
-        #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} | {: 3.8f} | {: 3.8f} |    {:1.8f} |  {:1.8f} |  {:1.8f} |      {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), errorRate, normJac))
-        output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), Fxy[0], Fxy[1]))
+        print("| {:3} | {: 3.8f} | {: 3.8f} |    {:1.8f} |  {:1.8f} |         {:1.8f} |      {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), errorRate, normJac))
+        output_file.write("\n| {:3} | {: 3.8f} | {: 3.8f} |    {:1.8f} |  {:1.8f} |         {:1.8f} |      {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), errorRate, normJac))
     return x,y
 
 
 #MAIN
 if __name__ == "__main__":
-    variants = [0] #, 18, 27]
+    variants = [18, 27]
     output_filename = "lr3_output.txt"
     output_file = open(output_filename, "w")
     output_file.write("Запорожченко, Педаев. ЛР3.")
 
     for i in range(len(variants)):
-        if (variants[i] == 0):
-            XY = [1.3, -1.7]
-        elif (variants[i] == 18):
+        if (variants[i] == 18):
             XY = [0.5, -0.9]
         elif (variants[i] == 27):
             XY = [0.2, -0.7]
@@ -333,9 +312,9 @@ if __name__ == "__main__":
         printHeader("iteration")
         writeHeader("iteration", output_file)
         itX, itY = Iteration(XY[0], XY[1], newtonXY, variants[i])
-        print("+----------------------------------------------------------------------------------+")
+        print("+-------------------------------------------------------------------------------------------------------+")
         print(f"x = {itX}, y = {itY};")
-        output_file.write("\n+---------------------------------------------------------------------------------+")
+        output_file.write("\n+-------------------------------------------------------------------------------------------------------+")
         output_file.write(f"\nx = {itX}, y = {itY};")
 
         printHeader("gradient")
