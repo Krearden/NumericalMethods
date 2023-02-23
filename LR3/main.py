@@ -1,7 +1,6 @@
 #coding=utf-8
 import math
 from matrixMethods import *
-from LU import *
 
 # Лабораторная работа № 3 на тему «Решение нелинейных уравнений»
 # Выполнили Запорожченко Кирилл и Педаев Михаил (ФЗ-11)
@@ -301,6 +300,21 @@ if __name__ == "__main__":
         print("\n\n\nVARIANT {}, {}".format(variants[i], XY))
         output_file.write("\n\nVARIANT {}".format(variants[i]))
 
+        print("\nx0={} y0={}".format(XY[0], XY[1]))
+        output_file.write("\n\nx0={} y0={}".format(XY[0], XY[1]))
+        print("Alfa0= 1.000 Lambda= 0.500")
+        output_file.write("\nAlfa0= 1.000 Lambda= 0.500\n")
+
+        print("\nМатрица производных")
+        output_file.write("\n\nМатрица производных\n")
+
+        if (variants[i] == 18):
+            print("2;  cos(x);\nsin(y+1);  1;")
+            output_file.write("2;  cos(x);\nsin(y+1);  1;")
+        elif (variants[i] == 27):
+            print("-1;  cos(x);\n-sin(y+0.5);  -2;")
+            output_file.write("-1;  cos(x);\n-sin(y+0.5);  -2;")
+
         printHeader("newton")
         writeHeader("newton", output_file)
         newtonXY = methodNewton(XY, variants[i], output_file)
@@ -308,6 +322,40 @@ if __name__ == "__main__":
         print(f"x = {newtonXY[0]}, y = {newtonXY[1]};")
         output_file.write("\n+---------------------------------------------------------------------------------------------------+")
         output_file.write(f"\nx = {newtonXY[0]}, y = {newtonXY[1]};")
+
+
+        print("\nМетод простой итерации")
+        output_file.write("\n\nМетод простой итерации")
+
+        if (variants[i]==18):
+            print("Fi1(x,y)=cos(y+1)/2")
+            print("Fi2(x,y)=-sin(x)-0.4")
+            output_file.write("\nFi1(x,y)=cos(y+1)/2\nFi2(x,y)=-sin(x)-0.4")
+        elif(variants[i]==27):
+            print("Fi1(x,y)=-0.8+cos(y+0.5)")
+            print("Fi2(x,y)=(sin(x)-1.6)/2")
+            output_file.write("\nFi1(x,y)=-0.8+cos(y+0.5)\nFi2(x,y)=(sin(x)-1.6)/2")
+        
+        print("\nЯкобиан")
+        output_file.write("\n\nЯкобиан\n")
+        if (variants[i]==18):
+            print("0;  -sin(y+1);")
+            print("-cos(x);  0;")
+            output_file.write("0;  -sin(y+0.5);\ncos(x);  0;")
+        elif(variants[i]==27):
+            print("0;  -sin(y+0.5);")
+            print("cos(x);  0;")
+            output_file.write("0;  -sin(y+0.5);\ncos(x);  0;")
+        
+        print("\nЗначение")
+        output_file.write("\n\nЗначение\n")
+        jak = getJacobian(XY[0], XY[1], variants[i])
+        print("{: 2.4f}  {: 2.4f}".format(jak[0][1], jak[0][1]))
+        print("{: 2.4f}  {: 2.4f}".format(jak[1][1], jak[1][1]))
+        output_file.write("{: 2.4f}  {: 2.4f}\n{: 2.4f}  {: 2.4f}".format(jak[0][1], jak[0][1], jak[1][1], jak[1][1]))
+
+        print("Норма={:2.4f}".format(getEucledianNorm(jak)))
+        output_file.write("\nНорма={:2.4f}".format(getEucledianNorm(jak)))
 
         printHeader("iteration")
         writeHeader("iteration", output_file)
