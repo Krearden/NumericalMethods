@@ -69,7 +69,7 @@ def getJacobian(x, y, variant):
     if (variant == 0):
         jak = [
         [0.0, math.sin(y-1)],
-        [-math.cos(x)/2,  0.0 ]
+        [-math.sin(x),  0.0 ]
         ]
     elif (variant == 18):
         jak = [
@@ -88,8 +88,8 @@ def getJacobian(x, y, variant):
 def getFxy(XY, variant):
     fX = [0 for i in range(len(XY))]
     if (variant == 0):
-        fX[0] = math.sin(XY[0]) + 2 * XY[1] - 1.6
-        fX[1] = math.cos(XY[1] - 1) + XY[0] - 1
+        fX[0] = math.sin(XY[0] + 2) - XY[1] - 1.5
+        fX[1] = math.cos(XY[1] - 2) + XY[0] - 0.5
     elif (variant == 18):
         fX[0] = 2 * XY[0] - math.cos(XY[1] + 1)
         fX[1] = XY[1] + math.sin(XY[0]) + 0.4
@@ -108,10 +108,10 @@ def getDerivativeMatrix(variant, x, y):
     dF = [[0 for i in range(N)] for i in range(N)]
     #test variant
     if (variant == 0):
-        dF[0][0] = math.cos(x) #f1 over x
-        dF[0][1] = 1 #f2 over x
-        dF[1][0] = 2 #f1 over y
-        dF[1][1] = -math.sin(y - 1) #f2 over y
+        dF[0][0] = 1 #f1 over x
+        dF[0][1] = -math.sin(y-1) #f2 over x
+        dF[1][0] = math.sin(x) #f1 over y
+        dF[1][1] = 1 #f2 over y
     elif (variant == 18):
         dF[0][0] = 2  # f1 over x
         dF[0][1] = math.cos(XY[0])  # f2 over x
@@ -275,20 +275,12 @@ def Iteration(x, y, newtonXY, variant):
     round = 0
     eps = 1e-4
 
-    mJac = getJacobian(x, y, variant)
-    norm = getEucledianNorm(mJac)
-    error = 1 + eps
-
-    defX = x
-    defY = y
-
-
     while(length([x, y], variant) > eps):
         round+=1
 
         if (variant == 0):
-            newX = 1-math.cos(y-1)
-            newY = 0.8-math.sin(x)/2
+            newX = 0.8-math.cos(y-1)
+            newY = 2+math.cos(x)
         elif (variant == 18):
             newX = math.cos(y+1)/2
             newY = -math.sin(x) - 0.4
@@ -297,7 +289,8 @@ def Iteration(x, y, newtonXY, variant):
             newY = (math.sin(x) - 1.6)/2
 
         mJac = getJacobian(x, y, variant)
-        norm = getEucledianNorm(mJac)
+        normJac = getEucledianNorm(mJac)
+        errorRate = normJac / (1 - normJac) * leng([x - newtonXY[0], y - newtonXY[1]])
 
         #error = norm / (1 - norm) * lenght(newX - x, newY - y)
         
@@ -306,21 +299,21 @@ def Iteration(x, y, newtonXY, variant):
         Fxy = getFxy([x, y], variant)
 
         #print(round, x, y, norm, eps-lenght(F1(x, y), F2(x, y)))
-        print("| {:3} | {: 3.8f} | {: 3.8f} |    {:1.8f} |  {:1.8f} |      {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), norm))
+        print("| {:3} | {: 3.8f} | {: 3.8f} |    {:1.8f} |  {:1.8f} |  {:1.8f} |      {: 3.8f} |".format(round, x, y, length([x, y], variant), leng([x - newtonXY[0], y - newtonXY[1]]), errorRate, normJac))
         output_file.write("\n| {:3} |  {:3.8f} |  {:3.8f} |    {:1.8f} |   {: 3.8f} |   {: 3.8f} |".format(round, x, y, length([x, y], variant), Fxy[0], Fxy[1]))
     return x,y
 
 
 #MAIN
 if __name__ == "__main__":
-    variants = [18, 27] #, 18, 27]
+    variants = [0] #, 18, 27]
     output_filename = "lr3_output.txt"
     output_file = open(output_filename, "w")
     output_file.write("Запорожченко, Педаев. ЛР3.")
 
     for i in range(len(variants)):
         if (variants[i] == 0):
-            XY = [0, 0.8]
+            XY = [1.3, -1.7]
         elif (variants[i] == 18):
             XY = [0.5, -0.9]
         elif (variants[i] == 27):
