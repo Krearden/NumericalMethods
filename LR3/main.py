@@ -63,6 +63,7 @@ def getEucledianNorm(A):
     return math.sqrt(max_diagonal)
 
 
+
 #Jacobi marix
 def getJacobian(x, y, variant):
     if (variant == 18):
@@ -78,6 +79,8 @@ def getJacobian(x, y, variant):
     else:
         jak == [[0, 0], [0, 0]]
     return jak
+
+
 
 def getFxy(XY, variant):
     fX = [0 for i in range(len(XY))]

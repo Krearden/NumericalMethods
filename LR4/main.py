@@ -1,5 +1,6 @@
 #coding=utf-8
 from math import *
+from LU import *
 
 
 # Лабораторная работа № 4 на тему «Интерполирование. Среднеквадратичное приближение. Равномерное приближение»
@@ -32,15 +33,16 @@ def getFx(x, variant):
     else:
         print("Not done yet")
 
+#Расстояние h между точками интерполяции по трем параметрам
 def getH(a, b, n):
     return (b - a) / (n - 1)
 
+#Факториал числа
 def Factorial(n):
     if (n == 0):
         return 1
     else:
         return n * Factorial(n - 1)
-
 
 #Таблица разделенных разностей
 def createSplitDiffTable(variant, a, b, n):
@@ -86,13 +88,14 @@ def getOmega(x, xs, n):
     return abs(result)
 
 #Фукнция - возвращает производную функции n-ного порядка
-def Derivative(variant, x, n):
+def Derivative(variant, x, n = 1):
     if (variant == 0):
         if (n >= 4):
             return pow(3, x) * pow(log(3), n)
+        elif (n == 1):
+            return log(3) * pow(3, x) + 9 * x * x
         else:
             return
-            # return log(3) * pow(3, x) + 9 * x * x
     else:
         print("Not implemented yet")
 
@@ -110,33 +113,103 @@ def getNewtonError(variant, x, xs, n):
 
 def printNewtonInterpolation(a, b, n, xs, differences_table):
     print("Интерполяционная формула Ньютона")
+    print("M6 (derivative) = {}\n".format(getMaxDerivatire(variant, xs, 6)))
     h = getH(a, b, n)
     x = a + h / 2
-    print(" x              f(x)              Pn(x)             Delta             Оценка погрешности ")
+    print("x       f(x)       Pn(x)       Delta       Оценка  ")
     while (x <= b):
         Fx = getFx(x, variant)
         newtonPx = getNewtonPolynom(x, xs, differences_table)
-        print("{:2.3f}, {}, {}, {}, {}".format(x, Fx, newtonPx, abs(newtonPx - Fx), getNewtonError(variant, x, xs, n)))
+        print("{:1.2f}  {:2.6f}  {:2.6f}  {:2.6e}  {:2.6e}".format(x, Fx, newtonPx, abs(newtonPx - Fx), getNewtonError(variant, x, xs, n)))
         x += h
 
 
 
-#Вычисление трехдиагональной матрицы (h = const for all xs's)
-def getThreeDiagonalMatrix(a, b, n):
-    h = getH(a, b, n)
-    matrix = [[0] * (n - 2) for i in range(n - 2)]
-    for i in range(n - 2):
-        matrix[i][i] = 2 * (h + h)
-        if (i < n / 2):
-            matrix[i + 1][i] = h
-            matrix[i][i + 1] = h
-    return matrix
+#solve SLAU
+def solve_SLAU(matrix, b):
+    A, L, U, p = LU(matrix)
+    # find x
+    b = multipMatrixByVector(getPmatrix(p), b)
+    y = forwardSubstitution(L, b)
+    x = backwardSubstitution(U, y)
+    return x
 
+def fi0(tau):
+    return (1 + 2 * tau) * pow(1 - tau, 2)
 
-def printCubicInterpolation(a, b, n):
+def fi1(tau):
+    return tau * pow(1 - tau, 2)
+
+#S31 - кубический сплайн дефекта 1
+def S31(x, xi, xnext, mi, mnext, h):
+    tau = (x - xi) / h
+    return fi0(tau) * getFx(xi, variant) + fi0(1 - tau) * getFx(xnext, variant) + h * (fi1(tau) * mi - fi1(1 - tau) * mnext)
+
+def printCubicInterpolation(a, b, n, variant):
     print("Интерполяция кубическим сплайном деф. 1")
-    matrix  = getThreeDiagonalMatrix(a, b, n)
-    printMatrix(matrix)
+    #задаем трехдиагональную матрицу для выбранных точек интерполяции
+    matrix = [[4, 1, 0, 0],[1, 4, 1, 0],[0, 1, 4, 1],[0, 0, 1, 4]]
+    #задаем вектор 1-х пр-х
+    m = [0 for i in range(n)]
+    m[0] = Derivative(variant, a)
+    m[5] = Derivative(variant, b)
+    #задаем вектор правых частей
+    h = getH(a, b, n)
+    b_vector = [0 for i in range(n - 2)]
+    for i in range(n - 2):
+        b_vector[i] = 3 * ( getFx(xs[i + 2], variant) - getFx(xs[i], variant) ) / h
+    #выполняем корректировку крайних элементов
+    b_vector[0] -= m[0]
+    b_vector[3] -= m[5]
+    #решение СЛАУ
+    mm = solve_SLAU(matrix, b_vector)
+    for i in range(1, n - 1):
+        m[i] = mm[i - 1]
+    #print
+    print()
+    print("M5 (derivative) = {}\n".format(getMaxDerivatire(variant, xs, 5)))
+    print("x[i]  df/dx(x[i])    m[i]      Delta       Оценка")
+    for i in range(n):
+        print("{:1.2f}  {:2.6f}  {:2.6f}  {:.6e}  {:.6e}".format(xs[i], Derivative(variant, xs[i]), m[i], abs(m[i] - Derivative(variant, xs[i])), getMaxDerivatire(variant, xs, 5) * pow(h, 4) / 60.0))
+
+    print("\nM4 (derivative) = {}\n".format(getMaxDerivatire(variant, xs, 4)))
+    print("x       f(x)     S31(f;x)     Abs(f - S31)        Оценка")
+    x = a + h / 2
+    i = 0
+    while(x <= b):
+        s31 = S31(x, xs[i], xs[i + 1], m[i], m[i + 1], h)
+        fx = getFx(x, variant)
+        error =  pow(h, 4) * (getMaxDerivatire(variant, xs, 4) / 384.0 + getMaxDerivatire(variant, xs, 5) * h / 240.0)
+        print("{:1.2f}  {:2.6f}  {:2.6f}  {:1.12e}  {:1.12e}".format(x, fx, s31, abs(fx - s31), error))
+        x += h
+        i += 1
+
+
+
+def b1():
+    return 1
+
+def b2(x):
+    return x
+
+def b3(x):
+    return x * x
+
+#базисные фукнкции для среднеквадратичного приближения
+def getBasisFuncitons(x):
+    basis = []
+    basis.append(b1())
+    basis.append(b2(x))
+    basis.append(b3(x))
+
+    return basis
+
+#среднеквадратичное приближение
+def printMiddleSquareApproximation():
+    pass
+
+
+
 
 #MAIN
 if __name__ == '__main__':
@@ -151,4 +224,4 @@ if __name__ == '__main__':
         printNewtonInterpolation(a, b, n, xs, differences_table)
 
         print()
-        printCubicInterpolation(a, b, n)
+        printCubicInterpolation(a, b, n, variant)
