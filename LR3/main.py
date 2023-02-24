@@ -1,7 +1,6 @@
 #coding=utf-8
 import math
 from matrixMethods import *
-from LU import *
 
 # Лабораторная работа № 3 на тему «Решение нелинейных уравнений»
 # Выполнили Запорожченко Кирилл и Педаев Михаил (ФЗ-11)
@@ -63,10 +62,6 @@ def getEucledianNorm(A):
 
     return math.sqrt(max_diagonal)
 
-
-#Jacobi marix
-def getJacobian():
-    pass
 
 def getFxy(XY, variant):
     fX = [0 for i in range(len(XY))]

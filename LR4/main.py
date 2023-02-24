@@ -96,7 +96,6 @@ def Derivative(variant, x, n = 1):
             return log(3) * pow(3, x) + 9 * x * x
         else:
             return
-            # return log(3) * pow(3, x) + 9 * x * x
     else:
         print("Not implemented yet")
 
@@ -184,6 +183,30 @@ def printCubicInterpolation(a, b, n, variant):
         print("{:1.2f}  {:2.6f}  {:2.6f}  {:1.12e}  {:1.12e}".format(x, fx, s31, abs(fx - s31), error))
         x += h
         i += 1
+
+
+
+def b1():
+    return 1
+
+def b2(x):
+    return x
+
+def b3(x):
+    return x * x
+
+#базисные фукнкции для среднеквадратичного приближения
+def getBasisFuncitons(x):
+    basis = []
+    basis.append(b1())
+    basis.append(b2(x))
+    basis.append(b3(x))
+
+    return basis
+
+#среднеквадратичное приближение
+def printMiddleSquareApproximation():
+    pass
 
 
 
