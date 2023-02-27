@@ -204,10 +204,40 @@ def getBasisFuncitons(x):
 
     return basis
 
-#среднеквадратичное приближение
-def printMiddleSquareApproximation():
-    pass
+def get_Gi_Gj(i, j, xs):
+    sum_multiply = 0
+    for x in xs:
+        sum_multiply += getBasisFuncitons(x)[i] * getBasisFuncitons(x)[j]
 
+    return sum_multiply
+
+#get (f, g)
+def get_f_g(i, xs, variant):
+    sum_multiply = 0
+    for x in xs:
+        sum_multiply += getBasisFuncitons(x)[i] * getFx(x, variant)
+    return sum_multiply
+
+#среднеквадратичное приближение
+def printMiddleSquareApproximation(xs):
+    print("\nСреднеквадратичное приближение")
+    #матрица коэффициентов n*n (n - amount of basis functions)
+    #содержит коэффициенты среднеквадратичного приближения функции
+    matrix = [[0 for j in range(3)] for i in range(3)]
+    for i in range(3):
+        for j in range(3):
+            matrix[i][j] = get_Gi_Gj(i, j, xs)
+    print("\nМатрица")
+    printMatrix(matrix)
+    #вектор правых частей
+    b = [0 for i in range(3)]
+    for i in range(3):
+        b[i] = get_f_g(i, xs, variant)
+    print("\nВектор правых частей")
+    print(b)
+    #получаем массив искомых коэф. путем решения СЛАУ
+    coefficients_array = solve_SLAU(matrix, b)
+    print(f"\nP2(x) = ({coefficients_array[0]}) + ({coefficients_array[1]}) * x + ({coefficients_array[2]}) * x^2")
 
 
 
@@ -225,3 +255,6 @@ if __name__ == '__main__':
 
         print()
         printCubicInterpolation(a, b, n, variant)
+
+        print()
+        printMiddleSquareApproximation(xs)
