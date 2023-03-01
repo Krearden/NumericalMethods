@@ -1,11 +1,17 @@
 #coding=utf-8
 from math import *
 from LU import *
+import sys
 
 
 # Лабораторная работа № 4 на тему «Интерполирование. Среднеквадратичное приближение. Равномерное приближение»
 # Выполнили Запорожченко Кирилл и Педаев Михаил (ФЗ-11)
 # 2023 г.
+
+
+# delete comment below if need to write to file
+# file_path = 'pedaev_zaporozhchenko_LR5.txt'
+# sys.stdout = open(file_path, "w")
 
 
 #FUNCTIONS
@@ -186,24 +192,17 @@ def printCubicInterpolation(a, b, n, variant):
 
 
 
-def b1():
-    return 1
-
-def b2(x):
-    return x
-
-def b3(x):
-    return x * x
 
 #базисные фукнкции для среднеквадратичного приближения
 def getBasisFuncitons(x):
     basis = []
-    basis.append(b1())
-    basis.append(b2(x))
-    basis.append(b3(x))
+    basis.append(1) #b1
+    basis.append(x) #b2
+    basis.append(x * x) #b3
 
     return basis
 
+#get (gi, gj) - скалярное произведение базисных фукнций
 def get_Gi_Gj(i, j, xs):
     sum_multiply = 0
     for x in xs:
@@ -211,7 +210,7 @@ def get_Gi_Gj(i, j, xs):
 
     return sum_multiply
 
-#get (f, g)
+#get (f, g) - скалярное произведение базис. фукнции. и ф-ии f(x)
 def get_f_g(i, xs, variant):
     sum_multiply = 0
     for x in xs:
@@ -237,7 +236,20 @@ def printMiddleSquareApproximation(xs):
     print(b)
     #получаем массив искомых коэф. путем решения СЛАУ
     coefficients_array = solve_SLAU(matrix, b)
+    #печать полинома второй степени на экран
     print(f"\nP2(x) = ({coefficients_array[0]}) + ({coefficients_array[1]}) * x + ({coefficients_array[2]}) * x^2")
+    #норма погрешности
+    F_square = 0
+    P_square = 0
+    for x in xs:
+        F_square += pow(getFx(x, variant), 2)
+        P_square += pow(coefficients_array[0] + coefficients_array[1] * x + coefficients_array[2] * x * x, 2)
+    print(f"Норма погрешности: {sqrt(F_square - P_square)}")
+    print("x       Погрешность")
+    for x in xs:
+        p2 = coefficients_array[0] + coefficients_array[1] * x + coefficients_array[2] * x * x
+        Fx = getFx(x, variant)
+        print("{:1.1f}   {:1.12f}".format(x, p2 - Fx))
 
 
 
