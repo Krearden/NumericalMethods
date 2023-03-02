@@ -217,6 +217,46 @@ def get_f_g(i, xs, variant):
         sum_multiply += getBasisFuncitons(x)[i] * getFx(x, variant)
     return sum_multiply
 
+#returns b_i * b_j
+def getBasisFunctionForContiniousVariant(x, i, j):
+    return getBasisFuncitons(x)[i] * getBasisFuncitons(x)[j]
+
+#интерграл методом Симпсона для определения коэффициентов матрицы непрерывного варианта
+def simpson_method(i, j, N = 10000, a = 1, b = 2):
+    h = (b - a) / N
+    f_x0 = getBasisFunctionForContiniousVariant(a, i, j)
+    sum_even = 0
+    sum_uneven = 0
+    for k in range(1, N, 2):
+        sum_even += getBasisFunctionForContiniousVariant((a + k * h), i, j)
+        sum_uneven += getBasisFunctionForContiniousVariant(a + (k + 1) * h, i, j)
+
+    return h / 3 * (f_x0 + 2 * sum_even + 4 * sum_uneven)
+
+#вектор правых частей для непрервыного варианта, посчитано с помощью WolframAlpha
+def get_b_vector_continious(variant):
+    if (variant == 0):
+        return [18.711435359761024361685441, 30.2823757012612226379606520, 50.3984832581529801104382368632604486]
+    else:
+        print("No variant like this yuet MotherFU@@'sdfer")
+
+#ф-я F(X)^2 - P(X)^2 для определения нормы погр. непр. варианта
+def FxPxSquaresDifference(x, coefficients_array):
+    return getFx(x, variant) ** 2 - (coefficients_array[0] + coefficients_array[1] * x + coefficients_array[2] * x ** 2) ** 2
+
+#вычисление нормы погрешности непрерывного интерграла.
+#численно вычисляется интеграл методом трапеций
+def getErrorContinious(coefficients_array):
+    ans = 0
+    eps = 1e-6
+    x = a + eps
+    while x <= b:
+        vl1 = FxPxSquaresDifference(x, coefficients_array)
+        vl2 = FxPxSquaresDifference(x - eps, coefficients_array)
+        ans += (vl1 + vl2) / 2. * eps
+        x += eps
+    return abs(ans)
+
 #среднеквадратичное приближение
 def printMiddleSquareApproximation(xs):
     print("\nСреднеквадратичное приближение")
@@ -250,7 +290,28 @@ def printMiddleSquareApproximation(xs):
         p2 = coefficients_array[0] + coefficients_array[1] * x + coefficients_array[2] * x * x
         Fx = getFx(x, variant)
         print("{:1.1f}   {:1.12f}".format(x, p2 - Fx))
-
+    print()
+    print("Непрерывный вариант")
+    # #вычисляем матрицу коэффициентов
+    # for i in range(3):
+    #     for j in range(3):
+    #         matrix[i][j] = simpson_method(i, j)
+    matrix = [[1, 1.5, 2.3333333333333333333], [1.5, 2.333333333333333, 3.75], [2.3333333333333333333, 3.75, 6.2]]
+    print("Матрица: ")
+    printMatrix(matrix)
+    print("Вектор правых частей: ")
+    print(b)
+    b = get_b_vector_continious(variant)
+    coefficients_array = solve_SLAU(matrix, b)
+    # печать полинома второй степени на экран
+    print(f"\nP2(x) = ({coefficients_array[0]}) + ({coefficients_array[1]}) * x + ({coefficients_array[2]}) * x^2")
+    error_norm = getErrorContinious(coefficients_array)
+    print("Норма погрешности: {}".format(error_norm))
+    print("x       Погрешность")
+    for x in xs:
+        p2 = coefficients_array[0] + coefficients_array[1] * x + coefficients_array[2] * x * x
+        Fx = getFx(x, variant)
+        print("{:1.1f}   {:1.12f}".format(x, p2 - Fx))
 
 
 #MAIN
