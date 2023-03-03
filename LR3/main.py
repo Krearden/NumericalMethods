@@ -77,7 +77,7 @@ def getJacobian(x, y, variant):
         [math.cos(x)/2,  0.0 ]
         ]
     else:
-        jak == [[0, 0], [0, 0]]
+        jak = [[0, 0], [0, 0]]
     return jak
 
 
@@ -231,7 +231,7 @@ def getEucledianVectorNorm(vector):
     return math.sqrt(result)
 
 
-#метод Градиентного Спуска не работает - проблема в условии завершения
+#метод Градиентного Спуска
 def methodGradient(XY, variant, newtonXY, output_file):
     epsilon = 1e-04
     timetostop = 1 + epsilon
