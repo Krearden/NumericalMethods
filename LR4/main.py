@@ -314,6 +314,47 @@ def printMiddleSquareApproximation(xs):
         print("{:1.1f}   {:1.12f}".format(x, p2 - Fx))
 
 
+
+
+#метод бисекции для поиска точки экстремума функции на заданном интервале
+def bisection_method(a, b, a1, variant):
+    epsilon = 1e-09
+    fa = Derivative(variant, a) - a1
+    fc = 0
+    c = 0
+    it_count = ceil(log2((b - a) / epsilon))
+    for i in range(it_count):
+        c = (a + b) / 2
+        fc = Derivative(variant, c) - a1
+        if fa * fc > 0:
+            a = c
+        else:
+            b = c
+    return c
+
+def printUniformApproximation(a, b, xs):
+    print("Равномерное приближение")
+
+    fa = getFx(a, variant)
+    fb = getFx(b, variant)
+    a1 = (fb - fa) / (b - a)
+    d = bisection_method(a, b, a1)
+    fd = getFx(d, variant)
+    a0 = (fa + fd - a1 * (a + d)) / 2
+
+    L = [0, 0, 0]
+    L[0] = getFx(a, variant) - a0 + a1 * a
+    L[1] = getFx(d, variant) - a0 + a1 * d
+    L[2] = getFx(b, variant) - a0 + a1 * b
+    print(f"P1(x)= {a0} + {a1}x, d = {d}")
+    print(f"L(a) = {L[0]}   L(d) = {L[1]}   L(b) = {L[2]}")
+    print("x    Погрешность")
+    for x in xs:
+        error = a0 + a1 * x - getFx(x, variant)
+        print(f"{x:.2f}    {error:.7f}")
+
+
+
 #MAIN
 if __name__ == '__main__':
     variants = [0]
