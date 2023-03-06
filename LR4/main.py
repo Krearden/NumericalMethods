@@ -36,8 +36,10 @@ def printMatrix(matrix, accuracy = False):
 def getFx(x, variant):
     if (variant == 0):
         return pow(3, x) + 3 * pow(x, 3) + 2
-    else:
-        print("Not done yet")
+    elif (variant == 18):
+        return pow(3, x) - 2 * x + 5
+    elif (variant == 11):
+        return pow(3, x) + 2 * x - 2
 
 #Расстояние h между точками интерполяции по трем параметрам
 def getH(a, b, n):
@@ -99,11 +101,15 @@ def Derivative(variant, x, n = 1):
         if (n >= 4):
             return pow(3, x) * pow(log(3), n)
         elif (n == 1):
-            return log(3) * pow(3, x) + 9 * x * x
+            return 9 * x * x + pow(3, x) * log(3)
         else:
             return
-    else:
-        print("Not implemented yet")
+    elif (variant == 18):
+        if (n == 1):
+            return pow(3, x) * log(3) - 2
+    elif (variant == 11):
+        if (n == 1):
+            return pow(3, x) * log(3) + 2
 
 def getMaxDerivatire(variant, xs, n):
     maximum_derivative = 1e-100
@@ -318,7 +324,7 @@ def printMiddleSquareApproximation(xs):
 
 #метод бисекции для поиска точки экстремума функции на заданном интервале
 def bisection_method(a, b, a1, variant):
-    epsilon = 1e-09
+    epsilon = 1e-07
     fa = Derivative(variant, a) - a1
     fc = 0
     c = 0
@@ -332,26 +338,35 @@ def bisection_method(a, b, a1, variant):
             b = c
     return c
 
-def printUniformApproximation(a, b, xs):
+#равномерное приближение
+def printUniformApproximation(a, b, xs, variant):
     print("Равномерное приближение")
-
+    #значения фукнции в начальной и конечной точках отрезка
     fa = getFx(a, variant)
     fb = getFx(b, variant)
+    #вычисляем коэффициенты a1 и a0 полинома первой степени
     a1 = (fb - fa) / (b - a)
-    d = bisection_method(a, b, a1)
+    d = bisection_method(a, b, a1, variant)
     fd = getFx(d, variant)
     a0 = (fa + fd - a1 * (a + d)) / 2
-
-    L = [0, 0, 0]
-    L[0] = getFx(a, variant) - a0 + a1 * a
-    L[1] = getFx(d, variant) - a0 + a1 * d
-    L[2] = getFx(b, variant) - a0 + a1 * b
-    print(f"P1(x)= {a0} + {a1}x, d = {d}")
-    print(f"L(a) = {L[0]}   L(d) = {L[1]}   L(b) = {L[2]}")
-    print("x    Погрешность")
+    #значения погрешностей аппроксимации функции
+    #на концах отрезка и в точке экстремума
+    L = [0 for i in range(3)]
+    L[0] = getFx(a, variant) - (a0 + a1 * a)
+    L[1] = getFx(d, variant) - (a0 + a1 * d)
+    L[2] = getFx(b, variant) - (a0 + a1 * b)
+    #вывод информации на экран
+    print("P1(x)= {:.4f} + {:.4f} * x, d = {:.4f}".format(a0, a1, d))
+    print("L(a) = {:.5f}   L(d) = {:.5f}   L(b) = {:.5f}".format(L[0], L[1], L[2]))
+    print("x       Погрешность")
     for x in xs:
         error = a0 + a1 * x - getFx(x, variant)
         print(f"{x:.2f}    {error:.7f}")
+
+
+
+def printReverseInterpolation(xs):
+    pass
 
 
 
@@ -368,7 +383,13 @@ if __name__ == '__main__':
         printNewtonInterpolation(a, b, n, xs, differences_table)
 
         print()
+        print()
         printCubicInterpolation(a, b, n, variant)
 
         print()
+        print()
         printMiddleSquareApproximation(xs)
+
+        print()
+        print()
+        printUniformApproximation(a, b, xs, variant)
