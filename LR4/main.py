@@ -73,7 +73,6 @@ def createSplitDiffTable(variant, a, b, n):
         differences_table[0].append(getFx(a, variant))
         a += h
         a = round(a, 2)
-
     for i in range(1, n):
         for j in range(n - i):
             differences_table[i].append((differences_table[i - 1][j + 1] - differences_table[i - 1][j]) / (xs[j + i] - xs[j]))
@@ -99,7 +98,7 @@ def getNewtonPolynom(x, xs, differences_table):
         part_summ *= x - xs[i]
     return y
 
-#Фукнция. Возвращает произведения разностей (x - xi): i = 0 ... n - 1; xi берется из таблицы разделенных разностей.
+#Фукнция. Возвращает произведения разностей (x - xi): i = 0 ... (n - 1); xi берется из таблицы разделенных разностей.
 def getOmega(x, xs, n):
     result = 1
     for i in range(n):
@@ -107,6 +106,7 @@ def getOmega(x, xs, n):
     return abs(result)
 
 
+#Вычисление маскимальной производной среди точек интерполяции
 def getMaxDerivatire(variant, xs, n):
     maximum_derivative = 1e-100
     for x in xs:
@@ -115,10 +115,12 @@ def getMaxDerivatire(variant, xs, n):
             maximum_derivative = first_derivative
     return maximum_derivative
 
+#Погрешность интерполяции методом Ньютона
 def getNewtonError(variant, x, xs, n):
     return getMaxDerivatire(variant, xs, n) * getOmega(x, xs, n)/ Factorial(n)
 
 
+#Интерполяция методом Ньютона
 def printNewtonInterpolation(a, b, n, xs, differences_table):
     print("Интерполяционная формула Ньютона")
     print("M6 (derivative) = {}\n".format(getMaxDerivatire(variant, xs, 6)))
@@ -133,7 +135,8 @@ def printNewtonInterpolation(a, b, n, xs, differences_table):
 
 
 
-#solve SLAU
+
+#решение слау методом LU разложения
 def solve_SLAU(matrix, b):
     A, L, U, p = LU(matrix)
     # find x
@@ -142,9 +145,11 @@ def solve_SLAU(matrix, b):
     x = backwardSubstitution(U, y)
     return x
 
+#вычисл. коэффициента для формулы куб. сплайна деф. 1
 def fi0(tau):
     return (1 + 2 * tau) * pow(1 - tau, 2)
 
+#вычисл. коэффициента для формулы куб. сплайна деф. 1
 def fi1(tau):
     return tau * pow(1 - tau, 2)
 
@@ -153,6 +158,7 @@ def S31(x, xi, xnext, mi, mnext, h):
     tau = (x - xi) / h
     return fi0(tau) * getFx(xi, variant) + fi0(1 - tau) * getFx(xnext, variant) + h * (fi1(tau) * mi - fi1(1 - tau) * mnext)
 
+#Интерполяция кубическим сплайном дефекта 1
 def printCubicInterpolation(a, b, n, variant):
     print("Интерполяция кубическим сплайном деф. 1")
     #задаем трехдиагональную матрицу для выбранных точек интерполяции
@@ -260,7 +266,7 @@ def getErrorContinious(coefficients_array):
         x += eps
     return abs(ans)
 
-#среднеквадратичное приближение
+#Среднеквадратичное приближение
 def printMiddleSquareApproximation(xs):
     print("\nСреднеквадратичное приближение")
     #матрица коэффициентов n*n (n - amount of basis functions)
@@ -393,8 +399,6 @@ def printReverseInterpolation(a, b, n, variant):
     print(f"c = {c}")
     print(f"Корень = {root}")
     print(f"Невязка = Abs(f(x) - c) = {abs(getFx(root, variant) - c)}")
-
-
 
 
 
