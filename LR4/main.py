@@ -34,12 +34,23 @@ def printMatrix(matrix, accuracy = False):
 
 #значение функции в точке x
 def getFx(x, variant):
-    if (variant == 0):
-        return pow(3, x) + 3 * pow(x, 3) + 2
-    elif (variant == 18):
+    if (variant == 18):
         return pow(3, x) - 2 * x + 5
-    elif (variant == 11):
-        return pow(3, x) + 2 * x - 2
+    elif (variant == 27):
+        return pow(e, -2 * x) - 2 * x + 1
+
+#Фукнция - возвращает производную функции n-ного порядка
+def Derivative(variant, x, n = 1):
+    if (variant == 18):
+        if (n == 1):
+            return pow(3, x) * log(3) - 2
+        elif (n > 1):
+            return pow(3, x) * pow(log(3), n)
+    elif (variant == 27):
+        if (n == 1):
+            return -2 * pow(e, -2 * x) - 2
+        elif (n > 1):
+            return pow(-1, n) * pow(2, n) * pow(e, -2 * x)
 
 #Расстояние h между точками интерполяции по трем параметрам
 def getH(a, b, n):
@@ -52,7 +63,7 @@ def Factorial(n):
     else:
         return n * Factorial(n - 1)
 
-#Таблица разделенных разностей
+#Таблица разделенных разностей for newton's method
 def createSplitDiffTable(variant, a, b, n):
     h = getH(a, b, n)
     xs = []
@@ -75,7 +86,7 @@ def printSplitDiffTable(xs, differences_table):
     for i in range(len(xs)):
         print("{:2.1f}".format(xs[i]), end = '  ')
         for j in range(len(differences_table[i])):
-            print(differences_table[j][i], end = ' ')
+            print(f"{differences_table[j][i]:.6f}", end = ' ')
         print()
 
 #Полином ньютона по таблице разделенных разностей
@@ -95,21 +106,6 @@ def getOmega(x, xs, n):
         result *= x - xs[i]
     return abs(result)
 
-#Фукнция - возвращает производную функции n-ного порядка
-def Derivative(variant, x, n = 1):
-    if (variant == 0):
-        if (n >= 4):
-            return pow(3, x) * pow(log(3), n)
-        elif (n == 1):
-            return 9 * x * x + pow(3, x) * log(3)
-        else:
-            return
-    elif (variant == 18):
-        if (n == 1):
-            return pow(3, x) * log(3) - 2
-    elif (variant == 11):
-        if (n == 1):
-            return pow(3, x) * log(3) + 2
 
 def getMaxDerivatire(variant, xs, n):
     maximum_derivative = 1e-100
@@ -177,7 +173,6 @@ def printCubicInterpolation(a, b, n, variant):
     mm = solve_SLAU(matrix, b_vector)
     for i in range(1, n - 1):
         m[i] = mm[i - 1]
-    #print
     print()
     print("M5 (derivative) = {}\n".format(getMaxDerivatire(variant, xs, 5)))
     print("x[i]  df/dx(x[i])    m[i]      Delta       Оценка")
@@ -241,10 +236,12 @@ def simpson_method(i, j, N = 10000, a = 1, b = 2):
 
 #вектор правых частей для непрервыного варианта, посчитано с помощью WolframAlpha
 def get_b_vector_continious(variant):
-    if (variant == 0):
-        return [18.711435359761024361685441, 30.2823757012612226379606520, 50.3984832581529801104382368632604486]
+    if (variant == 18):
+        return [7.461435359761024361685441, 11.515709034594555971293985, 18.398483258152980110438237]
+    elif (variant == 27):
+        return [-1.94149017782606074419985926, -3.088059752850124873113315, -5.057023389009286887753751]
     else:
-        print("No variant like this yuet MotherFU@@'sdfer")
+        print(" - It's something unpredictable but in the end is right\n - I hope you had a time of your life")
 
 #ф-я F(X)^2 - P(X)^2 для определения нормы погр. непр. варианта
 def FxPxSquaresDifference(x, coefficients_array):
@@ -272,18 +269,19 @@ def printMiddleSquareApproximation(xs):
     for i in range(3):
         for j in range(3):
             matrix[i][j] = get_Gi_Gj(i, j, xs)
-    print("\nМатрица")
+    print("\nДискретный вариант")
+    print("Матрица")
     printMatrix(matrix)
     #вектор правых частей
     b = [0 for i in range(3)]
     for i in range(3):
         b[i] = get_f_g(i, xs, variant)
-    print("\nВектор правых частей")
+    print("Вектор правых частей")
     print(b)
     #получаем массив искомых коэф. путем решения СЛАУ
     coefficients_array = solve_SLAU(matrix, b)
     #печать полинома второй степени на экран
-    print(f"\nP2(x) = ({coefficients_array[0]}) + ({coefficients_array[1]}) * x + ({coefficients_array[2]}) * x^2")
+    print(f"P2(x) = ({coefficients_array[0]}) + ({coefficients_array[1]}) * x + ({coefficients_array[2]}) * x^2")
     #норма погрешности
     F_square = 0
     P_square = 0
@@ -364,19 +362,51 @@ def printUniformApproximation(a, b, xs, variant):
         print(f"{x:.2f}    {error:.7f}")
 
 
+#метод обратной интерполяции
+def printReverseInterpolation(a, b, n, variant):
+    print("Решение уравнения методом обратной интерполяции")
+    xs = []
+    differences_table = [[] for i in range(n)]
+    h = getH(a, b, n)
+    #Находим коэфф. c по формуле (f(a) - f(b)) / 2
+    c = (getFx(a, variant) + getFx(b, variant)) / 2
+    #Заполняем список xs значениями f(x) - c для каждой точки на отрезке [a, b]
+    x_value = a
+    while(x_value <= b):
+        xs.append(getFx(x_value, variant) - c)
+        differences_table[0].append(round(x_value, 2))
+        x_value += h
+    #Заполняем таблицу разделенных разностей
+    for i in range(1, n):
+        for j in range(n - i):
+            differences_table[i].append((differences_table[i - 1][j + 1] - differences_table[i - 1][j]) / (xs[j + i] - xs[j]))
+    #Вывод таблицы разделенных разностей на экран
+    printSplitDiffTable(xs, differences_table)
+    #вычисляем корень по формуле полинома Ньютона
+    root = getNewtonPolynom(0, xs, differences_table)
+    #нахождение ближайшей к корню root точки из таблицы разностей
+    j = 0
+    while j < n and differences_table[0][j] < root:
+        j += 1
+    print(f"j = {j}")
 
-def printReverseInterpolation(xs):
-    pass
+    print(f"c = {c}")
+    print(f"Корень = {root}")
+    print(f"Невязка = Abs(f(x) - c) = {abs(getFx(root, variant) - c)}")
+
+
+
 
 
 
 #MAIN
 if __name__ == '__main__':
-    variants = [0]
+    variants = [18, 27]
     for variant in variants:
         a = 1
         b = 2
         n = 6
+        print(f"\n\n\nVARIANT {variant}\n")
         xs, differences_table = createSplitDiffTable(variant, a, b, n)
         printSplitDiffTable(xs, differences_table)
         print()
@@ -393,3 +423,7 @@ if __name__ == '__main__':
         print()
         print()
         printUniformApproximation(a, b, xs, variant)
+
+        print()
+        print()
+        printReverseInterpolation(a, b, n, variant)
