@@ -163,19 +163,19 @@ def printCubicInterpolation(a, b, n, variant):
     print("Интерполяция кубическим сплайном деф. 1")
     #задаем трехдиагональную матрицу для выбранных точек интерполяции
     matrix = [[4, 1, 0, 0],[1, 4, 1, 0],[0, 1, 4, 1],[0, 0, 1, 4]]
-    #задаем вектор 1-х пр-х
+    # задаем вектор 1-х пр-х
     m = [0 for i in range(n)]
     m[0] = Derivative(variant, a)
     m[5] = Derivative(variant, b)
-    #задаем вектор правых частей
+    # задаем вектор правых частей
     h = getH(a, b, n)
     b_vector = [0 for i in range(n - 2)]
     for i in range(n - 2):
-        b_vector[i] = 3 * ( getFx(xs[i + 2], variant) - getFx(xs[i], variant) ) / h
-    #выполняем корректировку крайних элементов
+        b_vector[i] = 3 * (getFx(xs[i + 2], variant) - getFx(xs[i], variant)) / h
+    # выполняем корректировку крайних элементов
     b_vector[0] -= m[0]
     b_vector[3] -= m[5]
-    #решение СЛАУ
+    # решение СЛАУ
     mm = solve_SLAU(matrix, b_vector)
     for i in range(1, n - 1):
         m[i] = mm[i - 1]
@@ -193,7 +193,7 @@ def printCubicInterpolation(a, b, n, variant):
         s31 = S31(x, xs[i], xs[i + 1], m[i], m[i + 1], h)
         fx = getFx(x, variant)
         error =  pow(h, 4) * (getMaxDerivatire(variant, xs, 4) / 384.0 + getMaxDerivatire(variant, xs, 5) * h / 240.0)
-        print("{:1.2f}  {:2.6f}  {:2.6f}  {:1.12e}  {:1.12e}".format(x, fx, s31, abs(fx - s31), error))
+        print("{:1.2f}  {:2.6f}  {:2.6f}  {:1.6e}  {:1.6e}".format(x, fx, s31, abs(fx - s31), error))
         x += h
         i += 1
 
@@ -374,7 +374,7 @@ def printReverseInterpolation(a, b, n, variant):
     xs = []
     differences_table = [[] for i in range(n)]
     h = getH(a, b, n)
-    #Находим коэфф. c по формуле (f(a) - f(b)) / 2
+    #Находим коэфф. c по формуле (f(a) + f(b)) / 2
     c = (getFx(a, variant) + getFx(b, variant)) / 2
     #Заполняем список xs значениями f(x) - c для каждой точки на отрезке [a, b]
     x_value = a
