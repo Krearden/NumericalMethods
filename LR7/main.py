@@ -4,7 +4,7 @@ from additionalFunc import *
 import sys
 from math import *
 
-from var24 import *
+from var18 import *
 
 #write out into file
 sys.stdout = open("out.txt", "w")
@@ -181,14 +181,14 @@ def shooting_method(F,x0,x1,y0,y1,a1,a2,h0,eps_rk,eps_sm,Y_real):
         history.append((i,a,B,abs(y1 - B)))
         i += 1 
     return a, history
-'''
+
 print("Метод стрельб")
 a, history = shooting_method(dZ,0,1,1,2,0,3,0.1,0.00001,0.0001,Y)
 print(table_for_shooting_method(history))
 _, history = runge_kutta(dZ,0,1,[a,1],0.1,0.00001,0.00625,Y)
 print(table_for_runge_kutta(history))
 print(" xI=%4.2f\n" % 0.2)
-'''
+
 
 #Явная конечно-разностная схема
 
