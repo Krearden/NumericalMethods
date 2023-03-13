@@ -1,5 +1,6 @@
 #coding=utf-8
 from math import *
+import sys
 
 
 # Лабораторная работа № 5 на тему «Численное интегрирование»
@@ -7,15 +8,15 @@ from math import *
 # 2023 г.
 
 
-# delete comment below if need to write to file
-# file_path = 'pedaev_zaporozhchenko_LR6(5).txt'
-# sys.stdout = open(file_path, "w")
-
-
 #GLOBAL VARIABLES
-variant = 18
+variant = 8
 count_uses = 0
 count_uses_dx = 0
+
+
+# delete comment below if need to write to file
+# file_path = f'lr5(6)_ped_zap_v{variant}.txt'
+# sys.stdout = open(file_path, "w")
 
 
 #FUNCTIONS
@@ -160,7 +161,7 @@ def solveIntegral(a, b, integral_sum_method, diff, alpha, epsilon):
         #Проверяем на первую итерацию, так как на первой итерации
         #Еще не существует прошлого значения интеграла
         if (n != 1):
-            delta_r = delta_r_coef * (I - I_before)
+            delta_r = delta_r_coef * (I - I_before) / I
         else:
             delta_r = nan
         #Относительная поргрешность
