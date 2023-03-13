@@ -70,6 +70,35 @@ def trapezoidalMethod(a, b, h):
 
     return 0.5 * h * (f(a) + f(b) + 2 * inner_sum)
 
+#интеграл методом трапеций с модификацией сплайном
+def spline_trapezoidalMethod(a, b, h):
+    if a > b:
+        a, b = b, a
+    inner_sum = 0.0
+    x_i = a + h
+    while x_i < b:
+        inner_sum += f(x_i)
+        x_i += h
+
+    return 0.5 * h * (f(a) + f(b) + 2 * inner_sum) + h * h * (dfdx(a) - dfdx(b)) / 12.0
+
+#интеграл методом Симпсона
+def simpsonMethod(a, b, h):
+    if a > b:
+        a, b = b, a
+    sum = 0.0
+    x_i = a
+    x_i1 = a + h
+    f_i = f(x_i)
+    while (x_i1 <= b):
+        f_i1 = f(x_i1)
+        sum += (x_i1 - x_i) * (f_i + 4* f((x_i + x_i1) / 2) + f_i1) / 6
+        x_i = x_i1
+        x_i1 += h
+        f_i = f_i1
+
+    return sum
+
 #Решение определенного интеграла с выбором метода, погрешность по Рунге
 def solveIntegral(a, b, integral_sum_method, diff, alpha, epsilon):
     global count_uses
@@ -86,7 +115,7 @@ def solveIntegral(a, b, integral_sum_method, diff, alpha, epsilon):
         count_uses = 0
         I = integral_sum_method(a, b, h)
         #Вычисляем оценку порядка сходимости. Должно приближаться к diff - порядку сходимости.
-        if (n != 1 and ((I - I_2before) / (I_before - I_2before) - 1.0) > 0):
+        if (n != 1 and n != 2):
             k = l * log((I - I_2before) / (I_before - I_2before) - 1.0)
         else:
             k = nan
@@ -126,6 +155,14 @@ if __name__ == '__main__':
     print()
     print("Метод трапеций")
     solveIntegral(a, b, trapezoidalMethod, 2, alpha, epsilon)
+    print()
+    print("Метод трапеций модифицированный сплайном")
+    solveIntegral(a, b, spline_trapezoidalMethod, 4, alpha, epsilon)
+    print()
+    print("Метод Симпсона")
+    solveIntegral(a, b, simpsonMethod, 4, alpha, epsilon)
+    print()
+    print("")
 
 
 
