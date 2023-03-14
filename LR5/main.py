@@ -25,9 +25,7 @@ count_uses_dx = 0
 def f(x):
     global count_uses
     count_uses += 1
-    if (variant == 8):
-        return pow(5, x) - 6 * x + 3
-    elif (variant == 18):
+    if (variant == 18):
         return pow(3, x) - 2 * x + 5
     elif (variant == 27):
         return pow(e, -2 * x) - 2 * x + 1
@@ -36,18 +34,14 @@ def f(x):
 def dfdx(x):
     global count_uses_dx
     count_uses_dx += 1
-    if (variant == 8):
-        return log(5) * pow(5, x) - 6
-    elif (variant == 18):
+    if (variant == 18):
         return log(3) * pow(3, x) - 2
     elif (variant == 27):
         return -2 * pow(e, -2 * x) - 2
 
 #первообразная от фукнции
 def F(x):
-    if (variant == 8):
-        return pow(5, x) / log(5) - 3 * x * x + 3 * x
-    elif (variant == 18):
+    if (variant == 18):
         return pow(3, x) / log(3) - (x * x) + 5 * x
     elif (variant == 27):
         return -(x * x) + x - pow(e, -2 * x) / 2
