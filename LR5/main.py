@@ -9,7 +9,7 @@ import sys
 
 
 #GLOBAL VARIABLES
-variant = 8
+variant = 18
 count_uses = 0
 count_uses_dx = 0
 
